@@ -1,0 +1,850 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+<head>
+  <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#3366CC">
+  <meta name="description" content="Varocol&#39;s Individual Blog">
+  <meta name="author" content="Varocol">
+  <meta name="keywords" content="">
+  <meta name="description" content="本文中的IDE是VScode,用的EIDE插件调用Keil的底层，所以跟Keil是一样的，只不过外观不一样。做实验用的是野火的霸道板子。下面的问题和细节在我的bilibili视频上会有说明。 我的bilibili视频链接  1.STM32 I2C 通讯失败后Busy位一直为1的问题相信只要玩过STM32 I2C外设的都有碰到过这个问题，调试的时候经常能看到刚刚初始化完成或者程序一运行Busy位就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)的一些实际问题和Bug">
+<meta property="og:url" content="https://www.varocol.top/2021/10/19/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9E%E9%99%85%E9%97%AE%E9%A2%98%E5%92%8CBug/index.html">
+<meta property="og:site_name" content="Varocol&#39;s Blog">
+<meta property="og:description" content="本文中的IDE是VScode,用的EIDE插件调用Keil的底层，所以跟Keil是一样的，只不过外观不一样。做实验用的是野火的霸道板子。下面的问题和细节在我的bilibili视频上会有说明。 我的bilibili视频链接  1.STM32 I2C 通讯失败后Busy位一直为1的问题相信只要玩过STM32 I2C外设的都有碰到过这个问题，调试的时候经常能看到刚刚初始化完成或者程序一运行Busy位就">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/095470f1b72c4076a6bd35335f63ee92.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/ef8699dfdd4d4afb8f7dd36177ca2759.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/89de2b766cb847e7843214e9c47e2535.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/a647055ef552492babbcd7e5e8317b3a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/b6d6d794b0d242afb88aa593bca15ed7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/8cda2e4ca7af4358944464c65ac3ae34.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/9a59f7b18b154e63818128c527a60af2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/c97e98e12a994849a273d1f153c84ea1.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/722b3f9779b242c2ac03775dff81752a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/ec2614b85e1846c0a39059c874e52677.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/e0715d69ff9c473aa1ccdccac7daee57.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/78ea2ac7f170470fb3208dcf17b837b5.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/c1b290d30079489ea9db70947b691bb7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/e56c7b84531944a3a7781eb1337d28ac.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/dccfef8b0ebe4128a19fd8043aa8012b.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/b5cb400123a94095bb28e7c60420509a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/54eb6564767f407b81efde0e30db7cc5.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/cb34fcb4c45f44b3b34623fa49ef0c3a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/4ef29936337042489a3ecf5a4f2f39eb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/c2413bf6a885414891cd84439d6507d6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/623279d7e21f47e98fa5de36b226f61a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/269988f7955a408e8e63654054061924.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/b69321e126794c47ac2cc04aa69117d7.png">
+<meta property="article:published_time" content="2021-10-18T20:17:07.000Z">
+<meta property="article:modified_time" content="2021-10-19T10:47:06.516Z">
+<meta property="article:author" content="Varocol">
+<meta property="article:tag" content="STM32">
+<meta property="article:tag" content="单片机">
+<meta property="article:tag" content="学习笔记">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/095470f1b72c4076a6bd35335f63ee92.png">
+  
+  <title>【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)的一些实际问题和Bug - Varocol&#39;s Blog</title>
+  <style>
+    .hitokoto-fullpage {
+          position: relative;
+          color: white;
+          z-index: 1;
+          margin-top: 35vh;
+          margin-bottom: 35vh;
+          margin-left: auto;
+          margin-right: auto;
+          font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'å¾®è½¯é›…é»‘', Arial, sans-serif;
+    }
+    .hitokoto-fullpage .bracket {
+          font-size: 30px;
+    }
+
+    .hitokoto-fullpage .bracket.left {
+          position: absolute;
+          left: 0;
+          top: 0;
+    }
+
+    .hitokoto-fullpage .bracket.right {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
+
+    .hitokoto-fullpage .word {
+        font-size: 2.3rem;
+        text-align: center;
+        line-height: 50px;
+        word-break: normal;
+        margin: 0;
+        padding: 15px 50px;
+    }
+
+    .hitokoto-fullpage .author {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.8);
+        float: right;
+        margin-top: 40px;
+    }
+    .github-badge {
+	     display: inline-block;
+	     border-radius: 4px;
+	     text-shadow: none;
+	     font-size: 12px;
+	     color: #fff;
+	     line-height: 15px;
+	     background-color: #ABBAC3;
+       margin-bottom: 5px;
+     }
+     .github-badge .badge-subject {
+     	display: inline-block;
+     	background-color: #4D4D4D;
+     	padding: 4px 4px 4px 6px;
+     	border-top-left-radius: 4px;
+     	border-bottom-left-radius: 4px;
+     }
+     .github-badge .badge-value {
+     	display: inline-block;
+     	padding: 4px 6px 4px 4px;
+     	border-top-right-radius: 4px;
+     	border-bottom-right-radius: 4px;
+     }
+     .github-badge .bg-brightgreen {
+     	background-color: #4DC820 !important;
+     }
+     .github-badge .bg-orange {
+     	background-color: #FFA500 !important;
+     }
+     .github-badge .bg-yellow {
+     	background-color: #D8B024 !important;
+     }
+     .github-badge .bg-blueviolet {
+     	background-color: #8833D7 !important;
+     }
+     .github-badge .bg-pink {
+     	background-color: #F26BAE !important;
+     }
+     .github-badge .bg-red {
+     	background-color: #e05d44 !important;
+     }
+     .github-badge .bg-blue {
+     	background-color: #007EC6 !important;
+     }
+     .github-badge .bg-lightgrey {
+     	background-color: #9F9F9F !important;
+     }
+     .github-badge .bg-grey, .github-badge .bg-gray {
+     	background-color: #555 !important;
+     }
+     .github-badge .bg-lightgrey, .github-badge .bg-lightgray {
+     	background-color: #9f9f9f !important;
+     }
+     .canvas {
+      position: fixed;
+      right: 0px;
+      bottom: 0px;
+      min-width: 100%;
+      min-height: 100%;
+      height: auto;
+      width: auto;
+      z-index: -1;
+     }
+
+
+  </style>
+  
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"www.varocol.top","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#100d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"G-EZ19RNEQ72","gtag":289234140,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":1280441904,"leancloud":{"app_id":"vLYir6cEaAnUE82loiiA0ip5-gzGzoHsz","app_key":"fECCUndFeDznE7kaIRFLMDDU","server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Varocol's Blog" type="application/atom+xml">
+</head>
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Varocol&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml">
+                <i class="iconfont icon-rss"></i>
+                RSS
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0)">
+          <div class="page-header text-center fade-in-up">
+            <!-- 借用hitokoto官网的模板 -->
+           
+                <span class="h2" id="subtitle" title="【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)的一些实际问题和Bug">
+                
+              </span>
+            
+              
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Varocol
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-10-18 20:17" pubdate>
+        2021/10/18 20:17:07
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.3k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      17 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)的一些实际问题和Bug</h1>
+            
+            <div class="markdown-body">
+              <hr>
+<p><strong>本文中的IDE是VScode,用的EIDE插件调用Keil的底层，所以跟Keil是一样的，只不过外观不一样。做实验用的是野火的霸道板子。下面的问题和细节在我的bilibili视频上会有说明。</strong></p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1v3411i7DZ/"><strong>我的bilibili视频链接</strong></a></p>
+<hr>
+<h1 id="1-STM32-I2C-通讯失败后Busy位一直为1的问题"><a href="#1-STM32-I2C-通讯失败后Busy位一直为1的问题" class="headerlink" title="1.STM32 I2C 通讯失败后Busy位一直为1的问题"></a>1.STM32 I2C 通讯失败后Busy位一直为1的问题</h1><p><strong>相信只要玩过STM32 I2C外设的都有碰到过这个问题，调试的时候经常能看到刚刚初始化完成或者程序一运行Busy位就为1的情况，网上查询了一下，这个问题已经存在很多年了，我也是准大二，刚刚调试完I2C，在学习的很多阶段都遇到过这个问题，我总结出来我碰到过的</strong><u>三种情况</u><strong>。</strong></p>
+<hr>
+<h2 id="a-程序错误导致的通讯失败，从而进入死循环"><a href="#a-程序错误导致的通讯失败，从而进入死循环" class="headerlink" title="a.程序错误导致的通讯失败，从而进入死循环"></a>a.程序错误导致的通讯失败，从而进入死循环</h2><hr>
+<h3 id="原因分析："><a href="#原因分析：" class="headerlink" title="原因分析："></a>原因分析：</h3><p><strong>对于刚开始写驱动的小白而言，对STM I2C时序图没有深入了解，所以代码容易写错，如果以错误的时序驱动STM32 I2C，那么当把程序烧入到STM32时，程序一瞬间运行卡死，然后导致Busy锁死，锁死之后调试发现还未初始化I2C 的SR2寄存器Busy位就有值，然后尝试复位，但只是按钮复位是不能清除锁死的Busy位，重新上电复位才能清除。上电后又运行错误的程序，然后就进入了无限制的循环。</strong></p>
+<p><strong>(PS:有些人可能会说其实不用管这个Busy位继续调试就行,但是作为初学者来说应该要知道Busy位为1这个问题侧面反映了你自己写程序是有问题的，如果程序正确了，Busy也就不为1(除非有其他的情况)。)</strong><br><br/></p>
+<hr>
+<h3 id="解决方案："><a href="#解决方案：" class="headerlink" title="解决方案："></a>解决方案：</h3><p><strong>把程序调正确。可以看火哥或者正点原子的视频，或者直接看正确的源代码(下面有野火亲测可用代码)，如果能够正确运行别人的代码，而自己的代码不好使，那么就是代码的问题;如果都不好使，那么可能是其他两种情况。</strong></p>
+<p><a target="_blank" rel="noopener" href="https://download.csdn.net/download/qq_35598074/21763497">野火示例代码</a></p>
+<hr>
+<h3 id="案例："><a href="#案例：" class="headerlink" title="案例："></a>案例：</h3><p><strong>计划是写WriteByte()函数和WritePage()函数，最后写一个ReadByte()函数验证，用串口输出测试信息。</strong><br><strong>(PS:这里的WriteByte()是用来写一个字节的,WritePage()是页写，ReadByte()是读多个字节)。</strong></p>
+<p><strong>写WriteByte函数没有任何问题,贴图如下。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/095470f1b72c4076a6bd35335f63ee92.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>然后后面也是一口气把WritePage()和ReadByte()函数全部写完，当然程序是有问题的，因为是自己照着时序图写的，没有在意一些细节,调试结果如下。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/ef8699dfdd4d4afb8f7dd36177ca2759.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>调试信息提示函数是卡在WritePage();然后进入调试环节，这里可以看到我已进入调试就出现了刚初始化I2C后SR2寄存器为2(Busy位为1)的情况，复位后也是如此，然后我将后来写的两个函数注释掉，就没有发生过这种情况，所以由此推断是程序编写错误所导致的初始化后Busy=1的问题。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/89de2b766cb847e7843214e9c47e2535.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>把程序调试好后就没有问题了结果如下。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/a647055ef552492babbcd7e5e8317b3a.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<hr>
+<h2 id="b-硬件错误导致的通讯失败，从而进入死循环"><a href="#b-硬件错误导致的通讯失败，从而进入死循环" class="headerlink" title="b.硬件错误导致的通讯失败，从而进入死循环"></a>b.硬件错误导致的通讯失败，从而进入死循环</h2><hr>
+<h3 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析:"></a>原因分析:</h3><p><strong>没有分析自己的硬件情况，盲目调试代码。比如：根据Busy位的介绍可以看到，SDA和SCL为低电平时，硬件将置1，这个置1是实时的，也就是这个位会根据你硬件的实际情况实时变化(即使I2C没有使能也会变化)。就比如你的SCL和SDA线突然短路了，那么就会导致这种情况。</strong></p>
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/b6d6d794b0d242afb88aa593bca15ed7.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+
+<hr>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案:"></a>解决方案:</h3><p><strong>可以尝试拿万用表测试一下引脚的电压值，看看是否达到所需要求，当然这个电压范围也要在EEPROM工作范围内，如果元件好使的话就是电路的问题，仔细排查肯定没问题。</strong><br><br/></p>
+<hr>
+<h3 id="案例：-1"><a href="#案例：-1" class="headerlink" title="案例："></a>案例：</h3><p><strong>刚把程序调试完,打算把程序升级一下，在追加一个WriteBuffer()函数，但是写完之后烧入第一遍是没问题的，然后用手摸了一下板子，结果发现程序又不行了，我就估计着这个板子可能是有些地方被摸短路了，重新上电程序正常运行，这是第一个地方。后面把这个程序用在I2C2上(板子上的I2C线路默认是接I2C1的)，测试了一下发现Busy=1，这次是因为I2C2的引脚没有接入线路，所以无法正常通讯。</strong><br><br/></p>
+<hr>
+<h2 id="c-工作到一半因为各种原因通讯失败，调试的时候出现Busy-1"><a href="#c-工作到一半因为各种原因通讯失败，调试的时候出现Busy-1" class="headerlink" title="c.工作到一半因为各种原因通讯失败，调试的时候出现Busy=1"></a>c.工作到一半因为各种原因通讯失败，调试的时候出现Busy=1</h2><hr>
+<p><strong>因为在实际开发生产过程很可能因为人为原因导致这个问题，但是又不可能断电复位，那么Busy位被锁死就非常棘手，所以这里可以借鉴一位优秀博主的解决方案。</strong></p>
+<p><strong><a target="_blank" rel="noopener" href="https://blog.csdn.net/dldw8816/article/details/51579781">解决方案</a></strong></p>
+<p><strong>具体操作流程可以看我视频，方案概括起来就是在初始化I2C之前先利用GPIO IPU模式上拉使其引脚高电平，然后再利用CR1寄存器的第15位SWRST软件复位，这样一来就能在SCL和SDA总线高电平的基础之上复位Busy，最后再重新配置GPIO为开漏继续初始化I2C。<br>这里可以看到这个软件复位说明中有提到可以复位Busy位。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/8cda2e4ca7af4358944464c65ac3ae34.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<hr>
+<h1 id="2-STM32-I2C-在调试的时候明明已经GenerateSTART结果SB还是为0"><a href="#2-STM32-I2C-在调试的时候明明已经GenerateSTART结果SB还是为0" class="headerlink" title="2.STM32 I2C 在调试的时候明明已经GenerateSTART结果SB还是为0"></a>2.STM32 I2C 在调试的时候明明已经GenerateSTART结果SB还是为0</h1><h3 id="原因分析：-1"><a href="#原因分析：-1" class="headerlink" title="原因分析："></a>原因分析：</h3><p><strong>STM32的这个位自带检测功能，也就是说这个位只有在==正确发送完==后才会置位，即使发送完成但是没有发送正确也是不置位的。就例如我给SCL线拉低了，这个时候就不满足起始条件的要求。</strong></p>
+<hr>
+<h3 id="解决方案：-1"><a href="#解决方案：-1" class="headerlink" title="解决方案："></a>解决方案：</h3><p><strong>如果是硬件问题，可以拿万用表测一下引脚，看看是否满足电位需求，一般来说硬件没有问题了这个位是没问题的。</strong></p>
+<hr>
+<h3 id="案例：-2"><a href="#案例：-2" class="headerlink" title="案例："></a>案例：</h3><p><strong>将开发板上的PB6(I2C1 SCL引脚)接入3.3V或者5V，程序就会出错，调试结果如下:</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/9a59f7b18b154e63818128c527a60af2.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>通过Debug我们也可以看到此时SR1寄存器的值为0，也就说明了SCL的电压低于所需的高电平标准，此时无法正确产生起始信号。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/c97e98e12a994849a273d1f153c84ea1.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<hr>
+<h1 id="3-火哥视频中所提到的问题-不能用CheckEvent-可以用getFlagStatus"><a href="#3-火哥视频中所提到的问题-不能用CheckEvent-可以用getFlagStatus" class="headerlink" title="3.火哥视频中所提到的问题(不能用CheckEvent(),可以用getFlagStatus())"></a>3.火哥视频中所提到的问题(不能用CheckEvent(),可以用getFlagStatus())</h1><h3 id="原因分析：-2"><a href="#原因分析：-2" class="headerlink" title="原因分析："></a>原因分析：</h3><p> <strong>首先说明一点:<br>   下面的结论大部分讨论的是发送的情况(主机当发送端的情况)，EV6事件是这个问题的关键，EV6事件检测5个位，分别为Busy，TRA，MSL，TXE，ADDR。所以下面的结论都会围绕这5个位进行说明。还有下面的图片不是直接用的固件库函数，是经过自己封装过的函数，效果与固件库一致。</strong></p>
+<p><strong>这里先提出四条结论：</strong><br>   <strong>==1.由于STM32 I2C发送速率(Max = 400K)远小于单片机本身运行的速率(72M),所以从发送(接收)完成到检测到EV6，EV8事件这段时间可以运行很多行代码，在主频为72M下I2C传输速率为400K情况下测出，要经过刚好8条CheckEvent()才会出现一次发送成功。==</strong><br>   <strong>==2.TXE和TRA以及ADDR位在地址发送成功并成功响应条件下是同时置位的。并且TXE和TRA状态时刻相同(至少我测出来是这样的)。==</strong><br>   <strong>==3.TXE和TRA会在起始条件或者停止条件后由硬件自动清除。==</strong><br>   <strong>==4.TXE和TRA的置位会受到从机应答的影响，过程为：主机先发送数据，发送结束后先等待从机的应答，如果从机应答，那么将TXE，TRA，ADDR置1，否则置0。==</strong></p>
+<hr>
+<p>   <strong>以下是关于结论说明</strong></p>
+<hr>
+<h4 id="结论1："><a href="#结论1：" class="headerlink" title="结论1："></a>结论1：</h4><p><strong>不难看出这一条结论说明当写入DR寄存器后仅仅只是写入了DR寄存器，数据也可能到达了移位寄存器，但是数据还没有完全发送出去，这需要好几次CheckEvent()执行完毕后才可能检测出EV6，或者EV8事件。所以从这条可以得出在使用SendData()后或者使用Send7bitAddress()后一定要跟一个检测事件循环。</strong></p>
+<hr>
+<h4 id="结论2："><a href="#结论2：" class="headerlink" title="结论2："></a>结论2：</h4><p><strong>经过测试可以得出在使用Send7bitAddress()后这些位同时置位的。视频中有相应说明，下面也有相关配图。<br>在使用Send7bitAddress()前:<br>可以看到SR1=1，SR2=3，这里的TRA和TXE还有ADDR都为0，SR1=1是刚发送了起始条件，SB=1。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/722b3f9779b242c2ac03775dff81752a.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>在使用Send7bitAddress()后:<br>这里的SR1 = 130，SR2 = 7，说明了TRA和TXE还有ADDR都为1。当然这是在调试断点的时候的，已经过了很长时间，两个断点之间的时间足以让EEPROM响应，所以这两组数据说服力不强。</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/ec2614b85e1846c0a39059c874e52677.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>所以我又重新做了一个实验，通过改写固件库中的CheckEvent()函数，往里面加了几行代码，使得每次寄存器的值都能够被记录到两个数组中。<br>贴图如下：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/e0715d69ff9c473aa1ccdccac7daee57.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>由于前面有一个EV5事件的检测，所以会有几组数据是EV5的数据，而我们所需要的是EV6事件的数据，所以可以先在检测EV6前断个点，最好是在Send7bitAddress()之前断点，得到如下结果。</strong></p>
+<p><strong>SR1寄存器：</strong></p>
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/78ea2ac7f170470fb3208dcf17b837b5.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+**SR2寄存器：**
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/c1b290d30079489ea9db70947b691bb7.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+**可以看到都是4组数据，然后我们只需从第5组数据开始分析数据即可(EV5事件结束后就是EV6)。
+继续往下运行得：
+SR1寄存器：**
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/e56c7b84531944a3a7781eb1337d28ac.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+**SR2寄存器：**
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/dccfef8b0ebe4128a19fd8043aa8012b.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+**刚好SR1寄存器的8个0对应SR2寄存器8个3，SR1寄存器最后一个130对应最后一个7。本次的测试没有将发送地址和检测EV6事件断开，是直接运行到底的。这也就很好的说明了结论1，并且最后一组数据说明了ADDR和TXE和TRA是同时置位的。这个也间接说明了结论4的正确性，不难猜出这三个位是有关联的。**
+
+<hr>
+<h4 id="结论3："><a href="#结论3：" class="headerlink" title="结论3："></a>结论3：</h4><p><strong>这一条是对于结论2的理论说明，先来看一下各个位的说明</strong><br><strong>TXE位：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/b5cb400123a94095bb28e7c60420509a.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>TRA位：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/54eb6564767f407b81efde0e30db7cc5.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>图上也说明了起始条件或停止条件都会清除这两个位，而且也可以看到TRA的值是根据RW来的，所以如果是发送情况的话这两个位是相同的。</strong></p>
+<hr>
+<h4 id="结论4-重点！！！-："><a href="#结论4-重点！！！-：" class="headerlink" title="结论4(重点！！！)："></a>结论4(重点！！！)：</h4><p><strong>这里可以沿用结论2的实验，操作如下：<br>在Send7bitAddress()的前面先断一个点，然后给SCL接一个5V(或者3.3V)导致SCL为低电平,在开始往下运行，然后按暂停键，查看寄存器的值。<br>结果如下：</strong></p>
+<p><strong>SR1寄存器：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/cb34fcb4c45f44b3b34623fa49ef0c3a.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<p><strong>SR2寄存器：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/4ef29936337042489a3ecf5a4f2f39eb.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>还是从第5个数据开始分析，不难看出现处于总线出错状态，所以BERR位置1，也就是SR1=256。从这里也可以看出TXE和ADDR以及TRA位都为0。对于TXE和TRA的一般认识都是I2C模块发送完毕后就会置位，但是这里并没有置位，因为总线出错的缘故，所以导致应答失败，进而没有置位TXE和TRA。<br>(有些杠精如果要说我这个AF应答失败位为啥没有置位，那么你去视频里看细节或者下面对于火哥问题的具体分析过程，这里就不细说，因为实际调Bug的时候没有这么顺利，也不是做这些实验调出来的，这些实验只能一部分说明，不能完全说明)。</strong></p>
+<hr>
+<h3 id="回归问题"><a href="#回归问题" class="headerlink" title="回归问题"></a>回归问题</h3><p>首先先将还未经过修改的代码贴出来<br>(PS：强调一下,这个代码经过个人封装，跟野火的不一样，抄了也没用，自己看懂了再去改)<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/c2413bf6a885414891cd84439d6507d6.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<p><strong>大概说明一下程序，首先，程序运行一次WriteByte(),然后再运行这个CheckAT24C02Busy函数(火哥的那个是WaitForWriteEnd(),一样的)。这个时候EEPROM正在忙碌，所以程序会整体卡在这部分代码里。</strong></p>
+<h4 id="1-第一点"><a href="#1-第一点" class="headerlink" title="1.第一点"></a>1.第一点</h4><p><strong>根据上述结论1和结论3程序运行完Send7bitAddress()后，只是经过一次CheckEvent()判断EV6事件，而新一轮循环又开始产生START信号，所以一次CheckEvent()的时间完全不足以置位TXE和TRA，其次有START信号就会清除TXE和TRA位，所以EV6永远不可能检测的出来。</strong></p>
+<h4 id="2-第二点"><a href="#2-第二点" class="headerlink" title="2.第二点"></a>2.第二点</h4><p><strong>即使可能发送出去了，因为EV5事件检测时需要读SR1和SR2寄存器，并且Send7bitAddress()函数会写入DR寄存器，这样就会清除ADDR位。这样的话5个位有3个位丢失了。</strong></p>
+<hr>
+<h4 id="针对前两点的临时解决方案"><a href="#针对前两点的临时解决方案" class="headerlink" title="针对前两点的临时解决方案"></a>针对前两点的临时解决方案</h4><p><strong>1. 先把EV5事件的CheckEvent()改为getFlag(),用于检测SB位，这样的话只读取了SR1寄存器，不是两个寄存器都读，也就不会清除ADDR位。</strong></p>
+<p><strong>2. 在Send7bitAddress()后面，CheckEvent()前面加一个While，用于检测TXE位，理论上可以保证有时间发送完成地址。(后面会说明这个地方是错误的)。</strong></p>
+<p><strong>得到如下结果：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/623279d7e21f47e98fa5de36b226f61a.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<hr>
+<p><strong>按下F5调试，你会发现程序会卡死在检测TXE位上，为什么？？？</strong></p>
+<h4 id="细节解释"><a href="#细节解释" class="headerlink" title="细节解释"></a>细节解释</h4><p><strong>根据最重要的结论4可知：由于EEPROM处于忙碌状态，在Send7bitAddress()后会处于应答失败的情况，也就是AF=1，这样一来TXE和TRA就不能置位，所以这样检验是徒劳的，只会让程序卡死。</strong></p>
+<h4 id="处理方案"><a href="#处理方案" class="headerlink" title="处理方案"></a>处理方案</h4><p><strong>不能光检测TXE位，应当AF和TXE同时检测，从上面的结论可以推导出来，如果应答成功，则AF=0，TXE=1，应答失败，则AF=1，TXE=0。所以可以同时检测两个位，结果如下：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/269988f7955a408e8e63654054061924.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br><strong>说明一下细节：<br>如果应答成功，那么这个检测AF和TXE的While()肯定能够满足地址有足够的发送时间。<br>如果应答失败，那么这个也可以有足够的时间，因为AF的置位是要等发送完成并且花一定的时间去等待应答，肯定够了。<br>所以就是要么AF=1，要么TXE=1，毕竟这两个位是有关系的。</strong></p>
+<p><strong>最后要注意的是，应答失败的循环肯定有好几次，那么对于用于检测<br>AF和TXE循环肯定是有影响的，毕竟AF位又不会自动清除，所以在每遍循环都要软件清除AF位。</strong></p>
+<p><strong>修改后代码的最终成品：</strong><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C读写EEPROM(AT24C02)的一些实际问题和Bug/images/b69321e126794c47ac2cc04aa69117d7.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<hr>
+<h1 id="4-后记"><a href="#4-后记" class="headerlink" title="4.后记"></a>4.后记</h1><p><strong>对于修改成功的代码可以往里面加入超时处理和用于输出调试信息的代码。整个过程来讲并没有这篇博客写的这么简单，前前后后也是经过反复测试和猜想的，这段过程给我最大的感受就是有些可能不是硬件上Bug，只能说是缺陷，只不过不知道而已，就比如这个SB位和TXE位都设计的过于智能，能够检测过程是否成功，成功再置位。这些东西在文档中没有说明，都得靠自己去摸索。再怎么Bug也是可以避过的，大不了用软件I2C(实际开发项目的时候是不建议这么做的，少了很多功能)。加油吧，打工人。</strong></p>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<h3 id="如果文章写的有问题的话，还请各位大佬指点"><a href="#如果文章写的有问题的话，还请各位大佬指点" class="headerlink" title="==如果文章写的有问题的话，还请各位大佬指点=="></a>==如果文章写的有问题的话，还请各位大佬指点==</h3><br/>
+<br/>
+
+<br/>
+
+<br/>
+
+
+
+
+<h1 id="原创的文章，写作不易，引用的时候记得给个链接！！！！！！！！！！！！！"><a href="#原创的文章，写作不易，引用的时候记得给个链接！！！！！！！！！！！！！" class="headerlink" title="原创的文章，写作不易，引用的时候记得给个链接！！！！！！！！！！！！！"></a>原创的文章，写作不易，引用的时候记得给个链接！！！！！！！！！！！！！</h1>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/STM32/">STM32</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/STM32/">STM32</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/">单片机</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/10/20/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)理论知识</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/10/11/USART%E4%B8%B2%E5%8F%A3/">
+                        <span class="hidden-mobile">【STM32学习笔记】USART串口</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"4a2be69ab3f57f6eadb8","clientSecret":"005138e8454534d2e0e6da03d6ac1054bb6d862f","repo":"Varocol.github.io","owner":"Varocol","admin":["Varocol"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":true,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '729f8386865dd98525dd1e96d436c1de'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+
+<footer class="text-center mt-5 py-3" 
+style="text-align:center ;position: relative; bottom: 0px; margin-top: 20px; margin-bottom: 20px;">
+  <div class="footer-content">
+    
+  </div>
+  <div class="Copyright 运行时间 百度统计" >
+    Copyright&copy2020-2021 
+    <a href = "index.html">VAROCOL'S BLOG</href></a>
+    |
+    
+
+    <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+    |
+    <a href = "https://tongji.baidu.com/web/welcome/ico?s=7dab352fc9f5c306287dcb844b669be5" target="_blank">百度统计</href></a>
+    |
+    
+      <!-- cnzz统计 -->
+      <script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1280441904'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1280441904%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+    
+  </div>
+  <div class="github-icons" style="text-align:center ;position: relative; bottom: 0px;margin-top: 20px; margin-bottom: 20px;">
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.io/" target="_blank" title="由 Hexo 强力驱动">
+      <span class="badge-subject">Powered</span><span class="badge-value bg-blue">Hexo</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://github.com/" target="_blank" title="静态网页托管于 GitHub Pages 和 Coding Pages">
+      <span class="badge-subject">Hosted</span><span class="badge-value bg-brightgreen">GitHub</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://cloud.tencent.com/" target="_blank" title="腾讯云提供域名相关服务">
+      <span class="badge-subject">DNS</span><span class="badge-value bg-blueviolet">TencentCloud</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://www.jsdelivr.com/" target="_blank" title="jsDelivr 提供 CDN 加速服务">
+      <span class="badge-subject">CDN</span><span class="badge-value bg-orange">JsDelivr</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.fluid-dev.com/docs/" target="_blank" title="站点使用 Fluid 主题">
+    <span class="badge-subject">Theme</span><span class="badge-value bg-blue">Fluid</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="本站点采用知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议进行许可">
+      <span class="badge-subject"><i class="fa fa-copyright">&copy</i></span><span class="badge-value bg-lightgrey">BY-NC-SA 4.0</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://996.icu/" target="_blank" title="支持 996.ICU">
+      <span class="badge-subject">Link</span><span class="badge-value bg-red">996.ICU</span></a>
+    </div>
+        
+<!-- LeanCloud 统计PV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="总阅读量">
+  <span class="badge-subject" id="leancloud-site-pv-container">PV</span><span class="badge-value bg-brightgreen" id="leancloud-site-pv"></span>
+  </div>
+</div>
+ 
+<!-- LeanCloud 统计UV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="访问人数">
+  <span class="badge-subject" id="leancloud-site-uv-container">UV</span><span class="badge-value bg-orange" id="leancloud-site-uv"></span>
+</div>
+</div>
+  
+    
+    <div class="github-badge">
+      <div style="color: #fff" rel="license" target="_blank" title="全站总字数"></a>
+      <span class="badge-subject">WordCount</span><span class="badge-value bg-blueviolet">13.3k</span></div>
+    </div>
+    
+    </div>    
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-EZ19RNEQ72', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=289234140"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '289234140');
+    </script>
+  
+
+  
+
+  
+
+  
+    <!-- cnzz Analytics -->
+    <!-- <script defer src="//s4.cnzz.com/z_stat.php?id=1280441904&show=pic"
+            type="text/javascript"></script> -->
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+<!--单击显示文字-->
+<!-- <script type="text/javascript" src="/js/click_show_text.js"></script> -->
+<!-- 点击冒点 -->
+<script src="/js/maodian.js"></script>
+<!--浏览器搞笑标题-->
+<script src="/js/FunnyTitle.js"></script>
+<!-- 雪花特效 -->
+<script src="\js\snow.js"></script>
+<!-- 樱花特效 -->
+<!-- <script src="/js/fairyDustCursor.js"></script> -->
+<!-- 代码雨 -->
+<script src="/js/DigitalRain.js"></script>
+<!-- 网页预加载 -->
+<script src="\js\instantclick.js"></script>
+<!-- 网站时间统计 -->
+<script src="\js\timecount.js"></script>
+<!-- 鼠标点击烟花爆炸 -->
+<!-- <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas>  -->
+<!-- <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>  -->
+<!-- <script src="/js/fireworks.js"></script> -->
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":175,"height":350},"mobile":{"show":true},"react":{"opacity":0.8},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

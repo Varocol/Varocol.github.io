@@ -1,0 +1,775 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+<head>
+  <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#3366CC">
+  <meta name="description" content="Varocol&#39;s Individual Blog">
+  <meta name="author" content="Varocol">
+  <meta name="keywords" content="">
+  <meta name="description" content="1.异常类型(中断类型）F103在内核水平上搭载了一个异常响应系统，支持为数众多的系统异常和外部中断。 系统异常8个（不算Reset和HardFault），外部中断有60个。 除个别异常的优先级被定死外，其他异常的优先级都可编程。 异常和外部中断可在标准库文件stm32f10x.h这个头文件找到，在IRQn_Type这个结构体里面包含 了F103系列全部的异常声明。     2.NVIC简介NVI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【STM32学习笔记】STM32中断">
+<meta property="og:url" content="https://www.varocol.top/2021/10/11/STM32%E4%B8%AD%E6%96%AD/index.html">
+<meta property="og:site_name" content="Varocol&#39;s Blog">
+<meta property="og:description" content="1.异常类型(中断类型）F103在内核水平上搭载了一个异常响应系统，支持为数众多的系统异常和外部中断。 系统异常8个（不算Reset和HardFault），外部中断有60个。 除个别异常的优先级被定死外，其他异常的优先级都可编程。 异常和外部中断可在标准库文件stm32f10x.h这个头文件找到，在IRQn_Type这个结构体里面包含 了F103系列全部的异常声明。     2.NVIC简介NVI">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/b81b6491adc68c59625aad2635f58eeb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/092f1c9277dbbc389e5734426beeb8a6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/f2bb4751068672398db78d63f2ce6083.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/8e64a7dd80f1f7d671c68b959e06c9e1.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/50ebe70c49da8c903cf276c3c0166e36.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/24570eefe1089b1eaa1ee141c7dc677d.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/6c3e34b5dde26a1ab58a374729c46dd0.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/7ec3b5f2758f18393cc0f9113d4a9be3.png">
+<meta property="article:published_time" content="2021-10-10T19:56:20.000Z">
+<meta property="article:modified_time" content="2021-10-10T12:42:53.746Z">
+<meta property="article:author" content="Varocol">
+<meta property="article:tag" content="STM32">
+<meta property="article:tag" content="单片机">
+<meta property="article:tag" content="学习笔记">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/b81b6491adc68c59625aad2635f58eeb.png">
+  
+  <title>【STM32学习笔记】STM32中断 - Varocol&#39;s Blog</title>
+  <style>
+    .hitokoto-fullpage {
+          position: relative;
+          color: white;
+          z-index: 1;
+          margin-top: 35vh;
+          margin-bottom: 35vh;
+          margin-left: auto;
+          margin-right: auto;
+          font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'å¾®è½¯é›…é»‘', Arial, sans-serif;
+    }
+    .hitokoto-fullpage .bracket {
+          font-size: 30px;
+    }
+
+    .hitokoto-fullpage .bracket.left {
+          position: absolute;
+          left: 0;
+          top: 0;
+    }
+
+    .hitokoto-fullpage .bracket.right {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
+
+    .hitokoto-fullpage .word {
+        font-size: 2.3rem;
+        text-align: center;
+        line-height: 50px;
+        word-break: normal;
+        margin: 0;
+        padding: 15px 50px;
+    }
+
+    .hitokoto-fullpage .author {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.8);
+        float: right;
+        margin-top: 40px;
+    }
+    .github-badge {
+	     display: inline-block;
+	     border-radius: 4px;
+	     text-shadow: none;
+	     font-size: 12px;
+	     color: #fff;
+	     line-height: 15px;
+	     background-color: #ABBAC3;
+       margin-bottom: 5px;
+     }
+     .github-badge .badge-subject {
+     	display: inline-block;
+     	background-color: #4D4D4D;
+     	padding: 4px 4px 4px 6px;
+     	border-top-left-radius: 4px;
+     	border-bottom-left-radius: 4px;
+     }
+     .github-badge .badge-value {
+     	display: inline-block;
+     	padding: 4px 6px 4px 4px;
+     	border-top-right-radius: 4px;
+     	border-bottom-right-radius: 4px;
+     }
+     .github-badge .bg-brightgreen {
+     	background-color: #4DC820 !important;
+     }
+     .github-badge .bg-orange {
+     	background-color: #FFA500 !important;
+     }
+     .github-badge .bg-yellow {
+     	background-color: #D8B024 !important;
+     }
+     .github-badge .bg-blueviolet {
+     	background-color: #8833D7 !important;
+     }
+     .github-badge .bg-pink {
+     	background-color: #F26BAE !important;
+     }
+     .github-badge .bg-red {
+     	background-color: #e05d44 !important;
+     }
+     .github-badge .bg-blue {
+     	background-color: #007EC6 !important;
+     }
+     .github-badge .bg-lightgrey {
+     	background-color: #9F9F9F !important;
+     }
+     .github-badge .bg-grey, .github-badge .bg-gray {
+     	background-color: #555 !important;
+     }
+     .github-badge .bg-lightgrey, .github-badge .bg-lightgray {
+     	background-color: #9f9f9f !important;
+     }
+     .canvas {
+      position: fixed;
+      right: 0px;
+      bottom: 0px;
+      min-width: 100%;
+      min-height: 100%;
+      height: auto;
+      width: auto;
+      z-index: -1;
+     }
+
+
+  </style>
+  
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"www.varocol.top","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#100d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"G-EZ19RNEQ72","gtag":289234140,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":1280441904,"leancloud":{"app_id":"vLYir6cEaAnUE82loiiA0ip5-gzGzoHsz","app_key":"fECCUndFeDznE7kaIRFLMDDU","server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Varocol's Blog" type="application/atom+xml">
+</head>
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Varocol&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml">
+                <i class="iconfont icon-rss"></i>
+                RSS
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0)">
+          <div class="page-header text-center fade-in-up">
+            <!-- 借用hitokoto官网的模板 -->
+           
+                <span class="h2" id="subtitle" title="【STM32学习笔记】STM32中断">
+                
+              </span>
+            
+              
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Varocol
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-10-10 19:56" pubdate>
+        2021/10/10 19:56:20
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      5 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">【STM32学习笔记】STM32中断</h1>
+            
+            <div class="markdown-body">
+              <h1 id="1-异常类型-中断类型）"><a href="#1-异常类型-中断类型）" class="headerlink" title="1.异常类型(中断类型）"></a>1.异常类型(中断类型）</h1><p>F103在内核水平上搭载了一个异常响应系统，支持为数众多的系统异常和外部中断。</p>
+<p><strong>系统异常8个（不算Reset和HardFault），外部中断有60个。</strong></p>
+<p>除<strong>个别异常的优先级被定死</strong>外，其他异常的优先级都可编程。</p>
+<p>异常和外部中断可在标准库文件<u><strong>stm32f10x.h</strong></u>这个头文件找到，在IRQn_Type这个结构体里面包含</p>
+<p>了F103系列全部的异常声明。</p>
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/b81b6491adc68c59625aad2635f58eeb.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:150%;" />
+
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/092f1c9277dbbc389e5734426beeb8a6.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:150%;" />
+
+<h1 id="2-NVIC简介"><a href="#2-NVIC简介" class="headerlink" title="2.NVIC简介"></a>2.NVIC简介</h1><p><strong><u>NVIC </u></strong> 嵌套向量中断控制器，控制着整个芯片中断相关功能，它跟内核紧密耦合，是内核里面的一个外设。</p>
+<h2 id="1-NVIC寄存器简介"><a href="#1-NVIC寄存器简介" class="headerlink" title="1.NVIC寄存器简介"></a>1.NVIC寄存器简介</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c_cpp">typedef struct &#123;<br>__IO uint32_t ISER[8]; // 中断使能寄存器<br>uint32_t RESERVED0[24];<br>__IO uint32_t ICER[8]; // 中断清除寄存器<br>uint32_t RSERVED1[24];<br>__IO uint32_t ISPR[8]; // 中断使能悬起寄存器<br>uint32_t RESERVED2[24];<br>__IO uint32_t ICPR[8]; // 中断清除悬起寄存器<br>uint32_t RESERVED3[24];<br>__IO uint32_t IABR[8]; // 中断有效位寄存器<br>uint32_t RESERVED4[56];<br>__IO uint8_t IP[240]; // 中断优先级寄存器(8Bit wide)<br>uint32_t RESERVED5[644];<br>__O uint32_t STIR; // 软件触发中断寄存器<br>&#125; NVIC_Type;<br></code></pre></td></tr></table></figure>
+
+<p>在配置中断的时候我们一般只用ISER、ICER和IP这三个寄存器，ISER用来使能中断，ICER用来失能中断，IP用来设置中断优先级。</p>
+<h2 id="2-NVIC中断配置固件库"><a href="#2-NVIC中断配置固件库" class="headerlink" title="2.NVIC中断配置固件库"></a>2.NVIC中断配置固件库</h2><p>在固件库文件core_cm3.h的最后，还提供了NVIC的一些函数，这些函数遵循CMSIS规则，只要是Cortex-M3的处理器都可以使用。</p>
+<h3 id="core-cm3-h"><a href="#core-cm3-h" class="headerlink" title="core_cm3.h"></a><strong><u>core_cm3.h</u></strong></h3><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/f2bb4751068672398db78d63f2ce6083.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+
+<br/>
+
+<h3 id="misc-h"><a href="#misc-h" class="headerlink" title="misc.h"></a><strong><u>misc.h</u></strong></h3><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/8e64a7dd80f1f7d671c68b959e06c9e1.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+
+<h1 id="3-优先级的定义"><a href="#3-优先级的定义" class="headerlink" title="3.优先级的定义"></a>3.优先级的定义</h1><h2 id="1-优先级的定义"><a href="#1-优先级的定义" class="headerlink" title="1.优先级的定义"></a>1.优先级的定义</h2><p>在NVIC中有一个专门的寄存器：中断优先级寄存器NVIC_IPRx，用来配置外部中断的优先级，IPR宽度为8bit，原则上每个外部中断可配置的优先级为0~255，数值越小，优先级越高，但绝大多数CM3芯片都会精简设计，在F103中，只使用了高4bit.</p>
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/50ebe70c49da8c903cf276c3c0166e36.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+
+<p>用于表达优先级的这 4bit，又被分组成<u><strong>抢占优先级</strong></u>和<u><strong>子优先级</strong></u>。如果有多个中断同时响应，<u><strong>抢占优先级高的就会抢占抢占优先级低的优先得到执行，如果抢占优先级相同，就比较子优先级。如果抢占优先级和子优先级都相同的话，就比较他们的硬件中断编号，编号越小，优先级越高。</strong></u></p>
+<h2 id="2-优先级分组"><a href="#2-优先级分组" class="headerlink" title="2.优先级分组"></a>2.优先级分组</h2><p>优先级的分组由内核外设 SCB 的应用程序中断及复位控制寄存器 AIRCR 的PRIGROUP[10:8]位决定， F103 分为了 5 组，具体如下：主优先级=抢占优先级.</p>
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/24570eefe1089b1eaa1ee141c7dc677d.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+
+<p>设置优先级分组可调用库函数 NVIC_PriorityGroupConfig()实现，有关 NVIC 中断相关的库函数都在库文件 misc.c 和 misc.h 中。</p>
+<img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/6c3e34b5dde26a1ab58a374729c46dd0.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+
+<h2 id="3-中断编程"><a href="#3-中断编程" class="headerlink" title="3.中断编程"></a>3.中断编程</h2><h3 id="1-使能中断请求"><a href="#1-使能中断请求" class="headerlink" title="1-使能中断请求"></a>1-使能中断请求</h3><p><em>这个具体由每个外设的相关中断使能位控制。比如串口有发送完成中断，接收完成中断，这两个中断都由串口控制寄存器的相关中断使能位控制。</em></p>
+<h3 id="2-配置中断优先级分组"><a href="#2-配置中断优先级分组" class="headerlink" title="2-配置中断优先级分组"></a>2-配置中断优先级分组</h3><p>调用NVIC_PriorityGroupConfig()这个函数，配置分组。</p>
+<h3 id="3-配置NVIC寄存器，初始化NVIC-InitTypeDef"><a href="#3-配置NVIC寄存器，初始化NVIC-InitTypeDef" class="headerlink" title="3-配置NVIC寄存器，初始化NVIC_InitTypeDef"></a>3-配置NVIC寄存器，初始化NVIC_InitTypeDef</h3><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32中断/images/7ec3b5f2758f18393cc0f9113d4a9be3.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />
+
+<h4 id="NVIC-IRQChannel-中断源"><a href="#NVIC-IRQChannel-中断源" class="headerlink" title="NVIC_IRQChannel:中断源"></a><strong>NVIC_IRQChannel:中断源</strong></h4><h4 id="NVIC-IRQChannelPreemptionPriority-抢占优先级"><a href="#NVIC-IRQChannelPreemptionPriority-抢占优先级" class="headerlink" title="NVIC_IRQChannelPreemptionPriority:抢占优先级"></a>NVIC_IRQChannelPreemptionPriority:抢占优先级</h4><h4 id="NVIC-IRQChannelSubPriority-子优先级"><a href="#NVIC-IRQChannelSubPriority-子优先级" class="headerlink" title="NVIC_IRQChannelSubPriority:子优先级"></a>NVIC_IRQChannelSubPriority:子优先级</h4><h4 id="NVIC-IRQChannelCmd-使能或者失能"><a href="#NVIC-IRQChannelCmd-使能或者失能" class="headerlink" title="NVIC_IRQChannelCmd:使能或者失能"></a>NVIC_IRQChannelCmd:使能或者失能</h4><h3 id="4-编写中断服务函数"><a href="#4-编写中断服务函数" class="headerlink" title="4-编写中断服务函数"></a>4-编写中断服务函数</h3>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/STM32/">STM32</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/STM32/">STM32</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/">单片机</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/10/11/TIM%E5%AE%9A%E6%97%B6%E5%99%A8/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【STM32学习笔记】TIM定时器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/10/11/SPI/">
+                        <span class="hidden-mobile">【STM32学习笔记】SPI协议</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"4a2be69ab3f57f6eadb8","clientSecret":"005138e8454534d2e0e6da03d6ac1054bb6d862f","repo":"Varocol.github.io","owner":"Varocol","admin":["Varocol"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":true,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '058b1dc9a22421dbdb092f33653486a3'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+
+<footer class="text-center mt-5 py-3" 
+style="text-align:center ;position: relative; bottom: 0px; margin-top: 20px; margin-bottom: 20px;">
+  <div class="footer-content">
+    
+  </div>
+  <div class="Copyright 运行时间 百度统计" >
+    Copyright&copy2020-2021 
+    <a href = "index.html">VAROCOL'S BLOG</href></a>
+    |
+    
+
+    <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+    |
+    <a href = "https://tongji.baidu.com/web/welcome/ico?s=7dab352fc9f5c306287dcb844b669be5" target="_blank">百度统计</href></a>
+    |
+    
+      <!-- cnzz统计 -->
+      <script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1280441904'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1280441904%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+    
+  </div>
+  <div class="github-icons" style="text-align:center ;position: relative; bottom: 0px;margin-top: 20px; margin-bottom: 20px;">
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.io/" target="_blank" title="由 Hexo 强力驱动">
+      <span class="badge-subject">Powered</span><span class="badge-value bg-blue">Hexo</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://github.com/" target="_blank" title="静态网页托管于 GitHub Pages 和 Coding Pages">
+      <span class="badge-subject">Hosted</span><span class="badge-value bg-brightgreen">GitHub</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://cloud.tencent.com/" target="_blank" title="腾讯云提供域名相关服务">
+      <span class="badge-subject">DNS</span><span class="badge-value bg-blueviolet">TencentCloud</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://www.jsdelivr.com/" target="_blank" title="jsDelivr 提供 CDN 加速服务">
+      <span class="badge-subject">CDN</span><span class="badge-value bg-orange">JsDelivr</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.fluid-dev.com/docs/" target="_blank" title="站点使用 Fluid 主题">
+    <span class="badge-subject">Theme</span><span class="badge-value bg-blue">Fluid</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="本站点采用知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议进行许可">
+      <span class="badge-subject"><i class="fa fa-copyright">&copy</i></span><span class="badge-value bg-lightgrey">BY-NC-SA 4.0</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://996.icu/" target="_blank" title="支持 996.ICU">
+      <span class="badge-subject">Link</span><span class="badge-value bg-red">996.ICU</span></a>
+    </div>
+        
+<!-- LeanCloud 统计PV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="总阅读量">
+  <span class="badge-subject" id="leancloud-site-pv-container">PV</span><span class="badge-value bg-brightgreen" id="leancloud-site-pv"></span>
+  </div>
+</div>
+ 
+<!-- LeanCloud 统计UV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="访问人数">
+  <span class="badge-subject" id="leancloud-site-uv-container">UV</span><span class="badge-value bg-orange" id="leancloud-site-uv"></span>
+</div>
+</div>
+  
+    
+    <div class="github-badge">
+      <div style="color: #fff" rel="license" target="_blank" title="全站总字数"></a>
+      <span class="badge-subject">WordCount</span><span class="badge-value bg-blueviolet">13.3k</span></div>
+    </div>
+    
+    </div>    
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-EZ19RNEQ72', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=289234140"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '289234140');
+    </script>
+  
+
+  
+
+  
+
+  
+    <!-- cnzz Analytics -->
+    <!-- <script defer src="//s4.cnzz.com/z_stat.php?id=1280441904&show=pic"
+            type="text/javascript"></script> -->
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+<!--单击显示文字-->
+<!-- <script type="text/javascript" src="/js/click_show_text.js"></script> -->
+<!-- 点击冒点 -->
+<script src="/js/maodian.js"></script>
+<!--浏览器搞笑标题-->
+<script src="/js/FunnyTitle.js"></script>
+<!-- 雪花特效 -->
+<script src="\js\snow.js"></script>
+<!-- 樱花特效 -->
+<!-- <script src="/js/fairyDustCursor.js"></script> -->
+<!-- 代码雨 -->
+<script src="/js/DigitalRain.js"></script>
+<!-- 网页预加载 -->
+<script src="\js\instantclick.js"></script>
+<!-- 网站时间统计 -->
+<script src="\js\timecount.js"></script>
+<!-- 鼠标点击烟花爆炸 -->
+<!-- <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas>  -->
+<!-- <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>  -->
+<!-- <script src="/js/fireworks.js"></script> -->
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":175,"height":350},"mobile":{"show":true},"react":{"opacity":0.8},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

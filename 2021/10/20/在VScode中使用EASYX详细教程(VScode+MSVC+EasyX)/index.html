@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+<head>
+  <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#3366CC">
+  <meta name="description" content="Varocol&#39;s Individual Blog">
+  <meta name="author" content="Varocol">
+  <meta name="keywords" content="">
+  <meta name="description" content="众所周知，vscode是一款强大的IDE，深受广大码友喜爱，博主曾尝试过用它实现各种脱离特定平台的写码，这里给大家介绍vscode配置EASYX的详细教程。  1.配置MSVC编译环境首先要知道的是EASYX官方库只支持vs的编译器，不支持MinGW，除非是自己从github上下的代码重新编译过的并且封装的库。可以借鉴一下其他优秀博主的教程，这里不详细介绍。参考教程1参考教程2  教程2没有包含v">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【EASYX配置教程】在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)">
+<meta property="og:url" content="https://www.varocol.top/2021/10/20/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/index.html">
+<meta property="og:site_name" content="Varocol&#39;s Blog">
+<meta property="og:description" content="众所周知，vscode是一款强大的IDE，深受广大码友喜爱，博主曾尝试过用它实现各种脱离特定平台的写码，这里给大家介绍vscode配置EASYX的详细教程。  1.配置MSVC编译环境首先要知道的是EASYX官方库只支持vs的编译器，不支持MinGW，除非是自己从github上下的代码重新编译过的并且封装的库。可以借鉴一下其他优秀博主的教程，这里不详细介绍。参考教程1参考教程2  教程2没有包含v">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206191846751.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/images/20201209170208553.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/images/20201209170345319.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/images/20201209170700525.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206193823672.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206194223713.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206195856601.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206200028902.png">
+<meta property="article:published_time" content="2021-10-19T19:13:07.000Z">
+<meta property="article:modified_time" content="2021-10-19T11:45:47.447Z">
+<meta property="article:author" content="Varocol">
+<meta property="article:tag" content="EasyX">
+<meta property="article:tag" content="教程">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206191846751.png">
+  
+  <title>【EASYX配置教程】在VScode中使用EASYX详细教程(VScode+MSVC+EasyX) - Varocol&#39;s Blog</title>
+  <style>
+    .hitokoto-fullpage {
+          position: relative;
+          color: white;
+          z-index: 1;
+          margin-top: 35vh;
+          margin-bottom: 35vh;
+          margin-left: auto;
+          margin-right: auto;
+          font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'å¾®è½¯é›…é»‘', Arial, sans-serif;
+    }
+    .hitokoto-fullpage .bracket {
+          font-size: 30px;
+    }
+
+    .hitokoto-fullpage .bracket.left {
+          position: absolute;
+          left: 0;
+          top: 0;
+    }
+
+    .hitokoto-fullpage .bracket.right {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
+
+    .hitokoto-fullpage .word {
+        font-size: 2.3rem;
+        text-align: center;
+        line-height: 50px;
+        word-break: normal;
+        margin: 0;
+        padding: 15px 50px;
+    }
+
+    .hitokoto-fullpage .author {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.8);
+        float: right;
+        margin-top: 40px;
+    }
+    .github-badge {
+	     display: inline-block;
+	     border-radius: 4px;
+	     text-shadow: none;
+	     font-size: 12px;
+	     color: #fff;
+	     line-height: 15px;
+	     background-color: #ABBAC3;
+       margin-bottom: 5px;
+     }
+     .github-badge .badge-subject {
+     	display: inline-block;
+     	background-color: #4D4D4D;
+     	padding: 4px 4px 4px 6px;
+     	border-top-left-radius: 4px;
+     	border-bottom-left-radius: 4px;
+     }
+     .github-badge .badge-value {
+     	display: inline-block;
+     	padding: 4px 6px 4px 4px;
+     	border-top-right-radius: 4px;
+     	border-bottom-right-radius: 4px;
+     }
+     .github-badge .bg-brightgreen {
+     	background-color: #4DC820 !important;
+     }
+     .github-badge .bg-orange {
+     	background-color: #FFA500 !important;
+     }
+     .github-badge .bg-yellow {
+     	background-color: #D8B024 !important;
+     }
+     .github-badge .bg-blueviolet {
+     	background-color: #8833D7 !important;
+     }
+     .github-badge .bg-pink {
+     	background-color: #F26BAE !important;
+     }
+     .github-badge .bg-red {
+     	background-color: #e05d44 !important;
+     }
+     .github-badge .bg-blue {
+     	background-color: #007EC6 !important;
+     }
+     .github-badge .bg-lightgrey {
+     	background-color: #9F9F9F !important;
+     }
+     .github-badge .bg-grey, .github-badge .bg-gray {
+     	background-color: #555 !important;
+     }
+     .github-badge .bg-lightgrey, .github-badge .bg-lightgray {
+     	background-color: #9f9f9f !important;
+     }
+     .canvas {
+      position: fixed;
+      right: 0px;
+      bottom: 0px;
+      min-width: 100%;
+      min-height: 100%;
+      height: auto;
+      width: auto;
+      z-index: -1;
+     }
+
+
+  </style>
+  
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"www.varocol.top","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#100d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"G-EZ19RNEQ72","gtag":289234140,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":1280441904,"leancloud":{"app_id":"vLYir6cEaAnUE82loiiA0ip5-gzGzoHsz","app_key":"fECCUndFeDznE7kaIRFLMDDU","server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Varocol's Blog" type="application/atom+xml">
+</head>
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Varocol&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml">
+                <i class="iconfont icon-rss"></i>
+                RSS
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0)">
+          <div class="page-header text-center fade-in-up">
+            <!-- 借用hitokoto官网的模板 -->
+           
+                <span class="h2" id="subtitle" title="【EASYX配置教程】在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)">
+                
+              </span>
+            
+              
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Varocol
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-10-19 19:13" pubdate>
+        2021/10/19 19:13:07
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.1k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      19 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">【EASYX配置教程】在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)</h1>
+            
+            <div class="markdown-body">
+              <p>众所周知，vscode是一款强大的IDE，深受广大码友喜爱，博主曾尝试过用它实现各种脱离特定平台的写码，这里给大家介绍vscode配置EASYX的详细教程。</p>
+<hr>
+<h2 id="1-配置MSVC编译环境"><a href="#1-配置MSVC编译环境" class="headerlink" title="1.配置MSVC编译环境"></a>1.配置MSVC编译环境</h2><p>首先要知道的是EASYX官方库只支持vs的编译器，不支持MinGW，除非是自己从github上下的代码重新编译过的并且封装的库。<br>可以借鉴一下其他优秀博主的教程，这里不详细介绍。<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/heilone6688/article/details/91050508">参考教程1</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38981614/article/details/99629597">参考教程2</a></p>
+<blockquote>
+<p>教程2没有包含vs的库，所以每次编译都要从vs的develop模式进入，有些麻烦，但是教程2的配置文件写的很详细，大家可以结合着看。如果配置文件有问题的话，博主下面会贴配置文件的代码</p>
+</blockquote>
+<hr>
+<h2 id="2-安装EASYX"><a href="#2-安装EASYX" class="headerlink" title="2.安装EASYX"></a>2.安装EASYX</h2><p><a target="_blank" rel="noopener" href="https://easyx.cn/">EASYX链接</a><br>官网界面如下：<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206191846751.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br>下载完直接安装（前提是你电脑要有vs系列，其实在安装MSVC环境的时候就已经应该有了)</p>
+<hr>
+<h2 id="3-EASYX文件路径的调整"><a href="#3-EASYX文件路径的调整" class="headerlink" title="3.EASYX文件路径的调整"></a>3.EASYX文件路径的调整</h2><p>如果你用easyx的软件安装的话，头文件和库文件会放在如下文件夹：<br>C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\VS\lib\x64<br>C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\VS\include<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/images/20201209170208553.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/images/20201209170345319.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><br>但实际上我们环境变量包含的库文件路径和头文件路径是在tools文件夹下的：<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/images/20201209170700525.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><br>而easyx的头文件和库文件并不在tools文件夹下，所以我需要做个迁移工作；<br>把C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\VS\lib\x64下的EasyXa.lib和EasyXw.lib复制到C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\lib\x64下，相应的，把C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\VS\include文件夹下的easyx.h和graphics.h复制到C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include，这样以后系统就能找到easyx的文件了。</p>
+<hr>
+<h2 id="4-划重点！！VScode各种json的配置"><a href="#4-划重点！！VScode各种json的配置" class="headerlink" title="4.划重点！！VScode各种json的配置"></a>4.划重点！！VScode各种json的配置</h2><p>如果之前你的MSVC环境配置好的话，并且能正常编译C++/C的代码的话，4个json文件的样子大概如下（已经安装MSVC环境还没安装EASYX的代码），大家如果配置文件不会配的话直接复制下面的代码也行，有些目录需要根据实际情况写入。</p>
+<h3 id="这里提醒一个常识：launch-json中的preLaunchTask参数和task-json中的label参数必须要对应，因为task是任务，launch想要调取任务两个名字就要相对应。"><a href="#这里提醒一个常识：launch-json中的preLaunchTask参数和task-json中的label参数必须要对应，因为task是任务，launch想要调取任务两个名字就要相对应。" class="headerlink" title="这里提醒一个常识：launch.json中的preLaunchTask参数和task.json中的label参数必须要对应，因为task是任务，launch想要调取任务两个名字就要相对应。"></a>这里提醒一个常识：launch.json中的preLaunchTask参数和task.json中的label参数必须要对应，因为task是任务，launch想要调取任务两个名字就要相对应。</h3><p><em><strong>launch.json</strong></em></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-comment">// 使用 IntelliSense 了解相关属性。 </span><br>    <span class="hljs-comment">// 悬停以查看现有属性的描述。</span><br>    <span class="hljs-comment">// 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387</span><br>    <span class="hljs-attr">&quot;version&quot;</span>: <span class="hljs-string">&quot;0.2.0&quot;</span>,<br>    <span class="hljs-attr">&quot;configurations&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;cl.exe - 生成和调试活动文件&quot;</span>,<br>            <span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;cppvsdbg&quot;</span>,<br>            <span class="hljs-attr">&quot;request&quot;</span>: <span class="hljs-string">&quot;launch&quot;</span>,<br>            <span class="hljs-attr">&quot;program&quot;</span>: <span class="hljs-string">&quot;$&#123;fileDirname&#125;\\$&#123;fileBasenameNoExtension&#125;.exe&quot;</span>,<br>            <span class="hljs-attr">&quot;args&quot;</span>: [],<br>            <span class="hljs-attr">&quot;stopAtEntry&quot;</span>: <span class="hljs-literal">false</span>,<br>            <span class="hljs-attr">&quot;cwd&quot;</span>: <span class="hljs-string">&quot;$&#123;workspaceFolder&#125;&quot;</span>,<br>            <span class="hljs-attr">&quot;environment&quot;</span>: [],<br>            <span class="hljs-attr">&quot;externalConsole&quot;</span>: <span class="hljs-literal">true</span>,<br>            <span class="hljs-attr">&quot;preLaunchTask&quot;</span>: <span class="hljs-string">&quot;C/C++: cl.exe build active file&quot;</span><br>        &#125;<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><em><strong>c_cpp_properties.json</strong></em></p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs clojure">&#123;<br>    <span class="hljs-string">&quot;configurations&quot;</span>: [<br>        &#123;<br>            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Win32&quot;</span>,<br>            <span class="hljs-string">&quot;includePath&quot;</span>: [<br>                <span class="hljs-string">&quot;$&#123;workspaceFolder&#125;/**&quot;</span><br>            ],<br>            <span class="hljs-string">&quot;defines&quot;</span>: [<br>                <span class="hljs-string">&quot;_DEBUG&quot;</span>,<br>                <span class="hljs-string">&quot;UNICODE&quot;</span>,<br>                <span class="hljs-string">&quot;_UNICODE&quot;</span><br>            ],<br>            <span class="hljs-string">&quot;windowsSdkVersion&quot;</span>: <span class="hljs-string">&quot;10.0.18362.0&quot;</span>,<br>            <span class="hljs-string">&quot;compilerPath&quot;</span>: <span class="hljs-string">&quot;C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.28.29333/bin/Hostx64/x64/cl.exe&quot;</span>,<br>            //cl.exe文件的目录要自己找，我这个是装的vs2019community版本，具体目录要根据你的情况，可以参考上面教程<span class="hljs-number">2</span>的配置方式<br>            <span class="hljs-string">&quot;cStandard&quot;</span>: <span class="hljs-string">&quot;c17&quot;</span>,，<br>            <span class="hljs-string">&quot;cppStandard&quot;</span>: <span class="hljs-string">&quot;c++17&quot;</span>,<br>            <span class="hljs-string">&quot;intelliSenseMode&quot;</span>: <span class="hljs-string">&quot;msvc-x64&quot;</span><br>        &#125;<br>    ],<br>    <span class="hljs-string">&quot;version&quot;</span>: <span class="hljs-number">4</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p><em><strong>settings.json</strong></em></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;files.associations&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;iostream&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;algorithm&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;chrono&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;codecvt&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;forward_list&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;functional&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;istream&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;limits&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;list&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;memory_resource&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;random&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;regex&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;utility&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;vector&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;xhash&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;xlocale&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;xmemory&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;xstring&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;xtree&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span>,<br>        <span class="hljs-attr">&quot;xutility&quot;</span>: <span class="hljs-string">&quot;cpp&quot;</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;C_Cpp.dimInactiveRegions&quot;</span>: <span class="hljs-literal">true</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p><em><strong>最重要的task.json</strong></em></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>	<span class="hljs-attr">&quot;version&quot;</span>: <span class="hljs-string">&quot;2.0.0&quot;</span>,<br>	<span class="hljs-attr">&quot;tasks&quot;</span>: [<br>		&#123;<br>			<span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;cppbuild&quot;</span>,<br>			<span class="hljs-attr">&quot;label&quot;</span>: <span class="hljs-string">&quot;C/C++: cl.exe build active file&quot;</span>,<br>			<span class="hljs-attr">&quot;command&quot;</span>: <span class="hljs-string">&quot;cl.exe&quot;</span>,<br>			<span class="hljs-attr">&quot;args&quot;</span>: [<br>				<span class="hljs-string">&quot;/Zi&quot;</span>,<br>				<span class="hljs-string">&quot;/EHsc&quot;</span>,<br>				<span class="hljs-string">&quot;/Fe:&quot;</span>,<br>				<span class="hljs-string">&quot;$&#123;fileDirname&#125;\\$&#123;fileBasenameNoExtension&#125;.exe&quot;</span>,<br>				<span class="hljs-string">&quot;$&#123;file&#125;&quot;</span><br>			],<br>			<span class="hljs-attr">&quot;options&quot;</span>: &#123;<br>				<span class="hljs-attr">&quot;cwd&quot;</span>: <span class="hljs-string">&quot;$&#123;workspaceFolder&#125;&quot;</span><br>			&#125;,<br>			<span class="hljs-attr">&quot;problemMatcher&quot;</span>: [<br>				<span class="hljs-string">&quot;$msCompile&quot;</span><br>			],<br>			<span class="hljs-attr">&quot;group&quot;</span>: <span class="hljs-string">&quot;build&quot;</span>,<br>			<span class="hljs-attr">&quot;detail&quot;</span>: <span class="hljs-string">&quot;compiler: cl.exe&quot;</span><br>		&#125;<br>	]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如果安装EASYX成功后你的vs应该可以索引到graphics.h这个文件：<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206193823672.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br>如果你就这样直接调试用EASYX的代码就会出现如下情况：<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206194223713.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" />经典的VS link2019问题<br>这是因为你少了把lib链接起来的命令<br>所以我们只要修改task.json就可以了</p>
+<h2 id="这里强调一下在type里的那个参数默认生成的是”cppbuild”-要给它改成”shell”！！-这个是关键）"><a href="#这里强调一下在type里的那个参数默认生成的是”cppbuild”-要给它改成”shell”！！-这个是关键）" class="headerlink" title="这里强调一下在type里的那个参数默认生成的是”cppbuild”,要给它改成”shell”！！!(这个是关键）"></a>这里强调一下在type里的那个参数默认生成的是”cppbuild”,要给它改成”shell”！！!(这个是关键）</h2><p><em><strong>task.json</strong></em></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;version&quot;</span>: <span class="hljs-string">&quot;2.0.0&quot;</span>,<br>    <span class="hljs-attr">&quot;tasks&quot;</span>: [<br>        &#123;<br>			<span class="hljs-attr">&quot;type&quot;</span>:<span class="hljs-string">&quot;shell&quot;</span>,<span class="hljs-comment">//不要用&quot;cppbuild&quot;!!!</span><br>            <span class="hljs-attr">&quot;label&quot;</span>: <span class="hljs-string">&quot;C/C++: cl.exe build active file&quot;</span>,<br>            <span class="hljs-attr">&quot;command&quot;</span>: <span class="hljs-string">&quot;cl.exe&quot;</span>,<br>            <span class="hljs-attr">&quot;args&quot;</span>: [<br>                <span class="hljs-string">&quot;/EHsc&quot;</span>,<br>				<span class="hljs-string">&quot;/Zi&quot;</span>,<br>				<span class="hljs-string">&quot;kernel32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;gdi32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;winspool.lib&quot;</span>,<br>				<span class="hljs-string">&quot;comdlg32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;advapi32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;shell32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;ole32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;oleaut32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;uuid.lib&quot;</span>,<br>				<span class="hljs-string">&quot;odbc32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;odbccp32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;User32.lib&quot;</span>,<br>				<span class="hljs-string">&quot;EasyXa.lib&quot;</span>,<br>				<span class="hljs-string">&quot;EasyXw.lib&quot;</span>,<br>				<span class="hljs-string">&quot;/Fd.\\&quot;</span>,<br>				<span class="hljs-string">&quot;/Fo.\\&quot;</span>,<br>				<span class="hljs-string">&quot;/Fe:&quot;</span>,<br>				<span class="hljs-string">&quot;$&#123;fileDirname&#125;\\$&#123;fileBasenameNoExtension&#125;.exe&quot;</span>,<br>				<span class="hljs-string">&quot;$&#123;file&#125;&quot;</span><br>            ],<br>            <span class="hljs-attr">&quot;options&quot;</span>: &#123;<br>                <span class="hljs-attr">&quot;cwd&quot;</span>: <span class="hljs-string">&quot;$&#123;workspaceFolder&#125;&quot;</span><br>            &#125;,<br>            <span class="hljs-attr">&quot;problemMatcher&quot;</span>: [<br>                <span class="hljs-string">&quot;$msCompile&quot;</span><br>            ],<br>            <span class="hljs-attr">&quot;group&quot;</span>: <span class="hljs-string">&quot;build&quot;</span>,<br>            <span class="hljs-attr">&quot;detail&quot;</span>: <span class="hljs-string">&quot;compiler: cl.exe&quot;</span><br>        &#125;,<br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这里强调一下,中间那些增加的lib是vs调用编译时所必须的,其中包括easyx的库,其次,为啥有人添加了那些lib结果发现还是报错,是因为你调错了模式,原task.json的type是cppbuild,应该给他改成shell命令行模式,这样才能执行下面arg里面的命令。还有就是”${fileDirname}\${fileBasenameNoExtension}.exe”和”${file}”分别代表生成的exe(名字中不带拓展名，如你写的源文件是1.cpp，对应的是1.exe而不是1.cpp.exe)。<br>最后就是”/Fd.\\“和”/Fo.\\“，其中/Fd和/Fo是命令，后面跟的是vc140.pdb和XX.obj文件的目录，如果用.\就表示工作区目录。如果你的vc140.pdb和XX.obj放在工作区下的一个build文件目录下的话那就可以改成”/Fdbuild\\“ 和 “/Fobuild\\“,但没必要，因为一般默认都生成在工作区内<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206195856601.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /><br>这是我写的代码，相应的文件位置关系如上图；<br>若环境配置正确那么结果如下图：<br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)/images/20201206200028902.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload style="zoom:200%;" /></p>
+<hr>
+<blockquote>
+<p>整个过程下来个人认为这个task.json是最伤人脑筋的，尤其是shell模式，我也是看我的终端上没有出调式命令才知道要调成shell模式，官方给的是cppbuild我也没办法。</p>
+</blockquote>
+<hr>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%95%99%E7%A8%8B/">教程</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/EasyX/">EasyX</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%95%99%E7%A8%8B/">教程</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/10/20/%E6%9D%AD%E7%94%B5%20oj%201006%20Tick%20and%20Tick%20%E4%B8%AA%E4%BA%BA%E9%A2%98%E8%A7%A3/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【HDU题解】杭电 Oj 1006 Tick and Tick 个人题解</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/10/20/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/">
+                        <span class="hidden-mobile">【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)理论知识</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"4a2be69ab3f57f6eadb8","clientSecret":"005138e8454534d2e0e6da03d6ac1054bb6d862f","repo":"Varocol.github.io","owner":"Varocol","admin":["Varocol"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":true,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'ff5527a0168170e401edf2ba4c2149b5'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+
+<footer class="text-center mt-5 py-3" 
+style="text-align:center ;position: relative; bottom: 0px; margin-top: 20px; margin-bottom: 20px;">
+  <div class="footer-content">
+    
+  </div>
+  <div class="Copyright 运行时间 百度统计" >
+    Copyright&copy2020-2021 
+    <a href = "index.html">VAROCOL'S BLOG</href></a>
+    |
+    
+
+    <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+    |
+    <a href = "https://tongji.baidu.com/web/welcome/ico?s=7dab352fc9f5c306287dcb844b669be5" target="_blank">百度统计</href></a>
+    |
+    
+      <!-- cnzz统计 -->
+      <script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1280441904'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1280441904%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+    
+  </div>
+  <div class="github-icons" style="text-align:center ;position: relative; bottom: 0px;margin-top: 20px; margin-bottom: 20px;">
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.io/" target="_blank" title="由 Hexo 强力驱动">
+      <span class="badge-subject">Powered</span><span class="badge-value bg-blue">Hexo</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://github.com/" target="_blank" title="静态网页托管于 GitHub Pages 和 Coding Pages">
+      <span class="badge-subject">Hosted</span><span class="badge-value bg-brightgreen">GitHub</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://cloud.tencent.com/" target="_blank" title="腾讯云提供域名相关服务">
+      <span class="badge-subject">DNS</span><span class="badge-value bg-blueviolet">TencentCloud</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://www.jsdelivr.com/" target="_blank" title="jsDelivr 提供 CDN 加速服务">
+      <span class="badge-subject">CDN</span><span class="badge-value bg-orange">JsDelivr</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.fluid-dev.com/docs/" target="_blank" title="站点使用 Fluid 主题">
+    <span class="badge-subject">Theme</span><span class="badge-value bg-blue">Fluid</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="本站点采用知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议进行许可">
+      <span class="badge-subject"><i class="fa fa-copyright">&copy</i></span><span class="badge-value bg-lightgrey">BY-NC-SA 4.0</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://996.icu/" target="_blank" title="支持 996.ICU">
+      <span class="badge-subject">Link</span><span class="badge-value bg-red">996.ICU</span></a>
+    </div>
+        
+<!-- LeanCloud 统计PV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="总阅读量">
+  <span class="badge-subject" id="leancloud-site-pv-container">PV</span><span class="badge-value bg-brightgreen" id="leancloud-site-pv"></span>
+  </div>
+</div>
+ 
+<!-- LeanCloud 统计UV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="访问人数">
+  <span class="badge-subject" id="leancloud-site-uv-container">UV</span><span class="badge-value bg-orange" id="leancloud-site-uv"></span>
+</div>
+</div>
+  
+    
+    <div class="github-badge">
+      <div style="color: #fff" rel="license" target="_blank" title="全站总字数"></a>
+      <span class="badge-subject">WordCount</span><span class="badge-value bg-blueviolet">13.3k</span></div>
+    </div>
+    
+    </div>    
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-EZ19RNEQ72', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=289234140"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '289234140');
+    </script>
+  
+
+  
+
+  
+
+  
+    <!-- cnzz Analytics -->
+    <!-- <script defer src="//s4.cnzz.com/z_stat.php?id=1280441904&show=pic"
+            type="text/javascript"></script> -->
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+<!--单击显示文字-->
+<!-- <script type="text/javascript" src="/js/click_show_text.js"></script> -->
+<!-- 点击冒点 -->
+<script src="/js/maodian.js"></script>
+<!--浏览器搞笑标题-->
+<script src="/js/FunnyTitle.js"></script>
+<!-- 雪花特效 -->
+<script src="\js\snow.js"></script>
+<!-- 樱花特效 -->
+<!-- <script src="/js/fairyDustCursor.js"></script> -->
+<!-- 代码雨 -->
+<script src="/js/DigitalRain.js"></script>
+<!-- 网页预加载 -->
+<script src="\js\instantclick.js"></script>
+<!-- 网站时间统计 -->
+<script src="\js\timecount.js"></script>
+<!-- 鼠标点击烟花爆炸 -->
+<!-- <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas>  -->
+<!-- <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>  -->
+<!-- <script src="/js/fireworks.js"></script> -->
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":175,"height":350},"mobile":{"show":true},"react":{"opacity":0.8},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

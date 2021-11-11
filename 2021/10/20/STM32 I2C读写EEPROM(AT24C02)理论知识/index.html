@@ -1,0 +1,811 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+<head>
+  <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#3366CC">
+  <meta name="description" content="Varocol&#39;s Individual Blog">
+  <meta name="author" content="Varocol">
+  <meta name="keywords" content="">
+  <meta name="description" content="STM32 I2C读写EEPROM(AT24C02)个人调试Bug经验本篇文章是本人学习野火STM32读写EEPROM的视频总结而来的笔记,上面的链接有解答关于《火哥视频中EEPROM_WaitForWriteEnd()函数检测EV6事件为什么不能用CheckEvent()函数来检测》问题的解答。上述问题火哥视频的链接[24-I2C—读写EEPROM（第7节中）—代码详解-读写EEPROM]  进">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)理论知识">
+<meta property="og:url" content="https://www.varocol.top/2021/10/20/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="Varocol&#39;s Blog">
+<meta property="og:description" content="STM32 I2C读写EEPROM(AT24C02)个人调试Bug经验本篇文章是本人学习野火STM32读写EEPROM的视频总结而来的笔记,上面的链接有解答关于《火哥视频中EEPROM_WaitForWriteEnd()函数检测EV6事件为什么不能用CheckEvent()函数来检测》问题的解答。上述问题火哥视频的链接[24-I2C—读写EEPROM（第7节中）—代码详解-读写EEPROM]  进">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/58bf08d2a99f4d48832f15001f33f5b6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/211966f5a4384c6e8b080a413f2b8e00.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/605b347efddd4f059c7f07419ef923a8.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/a6d42d3b5fe04790a1f8ad7ee042e383.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b2e117d16f914160aebedd83263d52ee.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/046d448f1f414cc68d699eb59f829c99.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/5e747754a818448ab1bb687014ac6cb2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/d903ef71ddda44e7ae4c784cb25e90c4.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b93e18ec2b2546cabe88cb26fba88e2a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/0e3e9bbbdba1475bb26b499ffa1e5f72.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/3639a075012f44898dce0f54b34c378e.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/4eed5acd5bac48b29db5db930956b66d.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/8f849285deff4e21a8e7f636dc3e38eb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b23f45a0fe584e6b9625452f1a7502a4.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/3e3b8c0356a54b0e9ea86516379a6605.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/84370d0750f141499dc845d24bd3deb3.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/7fd4b855a80f4036aaf04d598f0533d6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/41e5fbc1f0084619878c80ff84814f57.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/299a94df358a45faaa7c259675d3d748.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b22a375d6ac9486f87e04fba69810ffb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/167761144d1c4da98952f5a8b9a7a573.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/f7345ec5247e466bb5c6180d7ff39ece.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/7d93b9b5359440e7875a960e3c082f4b.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/3cecb490735e47ba881c757f83345d41.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/abbe6829601a43daa4c0aa17420c9982.png">
+<meta property="article:published_time" content="2021-10-19T19:03:07.000Z">
+<meta property="article:modified_time" content="2021-10-19T11:09:10.590Z">
+<meta property="article:author" content="Varocol">
+<meta property="article:tag" content="STM32">
+<meta property="article:tag" content="单片机">
+<meta property="article:tag" content="学习笔记">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/58bf08d2a99f4d48832f15001f33f5b6.png">
+  
+  <title>【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)理论知识 - Varocol&#39;s Blog</title>
+  <style>
+    .hitokoto-fullpage {
+          position: relative;
+          color: white;
+          z-index: 1;
+          margin-top: 35vh;
+          margin-bottom: 35vh;
+          margin-left: auto;
+          margin-right: auto;
+          font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'å¾®è½¯é›…é»‘', Arial, sans-serif;
+    }
+    .hitokoto-fullpage .bracket {
+          font-size: 30px;
+    }
+
+    .hitokoto-fullpage .bracket.left {
+          position: absolute;
+          left: 0;
+          top: 0;
+    }
+
+    .hitokoto-fullpage .bracket.right {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
+
+    .hitokoto-fullpage .word {
+        font-size: 2.3rem;
+        text-align: center;
+        line-height: 50px;
+        word-break: normal;
+        margin: 0;
+        padding: 15px 50px;
+    }
+
+    .hitokoto-fullpage .author {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.8);
+        float: right;
+        margin-top: 40px;
+    }
+    .github-badge {
+	     display: inline-block;
+	     border-radius: 4px;
+	     text-shadow: none;
+	     font-size: 12px;
+	     color: #fff;
+	     line-height: 15px;
+	     background-color: #ABBAC3;
+       margin-bottom: 5px;
+     }
+     .github-badge .badge-subject {
+     	display: inline-block;
+     	background-color: #4D4D4D;
+     	padding: 4px 4px 4px 6px;
+     	border-top-left-radius: 4px;
+     	border-bottom-left-radius: 4px;
+     }
+     .github-badge .badge-value {
+     	display: inline-block;
+     	padding: 4px 6px 4px 4px;
+     	border-top-right-radius: 4px;
+     	border-bottom-right-radius: 4px;
+     }
+     .github-badge .bg-brightgreen {
+     	background-color: #4DC820 !important;
+     }
+     .github-badge .bg-orange {
+     	background-color: #FFA500 !important;
+     }
+     .github-badge .bg-yellow {
+     	background-color: #D8B024 !important;
+     }
+     .github-badge .bg-blueviolet {
+     	background-color: #8833D7 !important;
+     }
+     .github-badge .bg-pink {
+     	background-color: #F26BAE !important;
+     }
+     .github-badge .bg-red {
+     	background-color: #e05d44 !important;
+     }
+     .github-badge .bg-blue {
+     	background-color: #007EC6 !important;
+     }
+     .github-badge .bg-lightgrey {
+     	background-color: #9F9F9F !important;
+     }
+     .github-badge .bg-grey, .github-badge .bg-gray {
+     	background-color: #555 !important;
+     }
+     .github-badge .bg-lightgrey, .github-badge .bg-lightgray {
+     	background-color: #9f9f9f !important;
+     }
+     .canvas {
+      position: fixed;
+      right: 0px;
+      bottom: 0px;
+      min-width: 100%;
+      min-height: 100%;
+      height: auto;
+      width: auto;
+      z-index: -1;
+     }
+
+
+  </style>
+  
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"www.varocol.top","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#100d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"G-EZ19RNEQ72","gtag":289234140,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":1280441904,"leancloud":{"app_id":"vLYir6cEaAnUE82loiiA0ip5-gzGzoHsz","app_key":"fECCUndFeDznE7kaIRFLMDDU","server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Varocol's Blog" type="application/atom+xml">
+</head>
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Varocol&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml">
+                <i class="iconfont icon-rss"></i>
+                RSS
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0)">
+          <div class="page-header text-center fade-in-up">
+            <!-- 借用hitokoto官网的模板 -->
+           
+                <span class="h2" id="subtitle" title="【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)理论知识">
+                
+              </span>
+            
+              
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Varocol
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-10-19 19:03" pubdate>
+        2021/10/19 19:03:07
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      6 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)理论知识</h1>
+            
+            <div class="markdown-body">
+              <h1 id="STM32-I2C读写EEPROM-AT24C02-个人调试Bug经验"><a href="#STM32-I2C读写EEPROM-AT24C02-个人调试Bug经验" class="headerlink" title="STM32 I2C读写EEPROM(AT24C02)个人调试Bug经验"></a><a href="https://www.varocol.top/2021/10/19/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9E%E9%99%85%E9%97%AE%E9%A2%98%E5%92%8CBug/">STM32 I2C读写EEPROM(AT24C02)个人调试Bug经验</a></h1><h4 id="本篇文章是本人学习野火STM32读写EEPROM的视频总结而来的笔记-上面的链接有解答关于《火哥视频中EEPROM-WaitForWriteEnd-函数检测EV6事件为什么不能用CheckEvent-函数来检测》问题的解答。"><a href="#本篇文章是本人学习野火STM32读写EEPROM的视频总结而来的笔记-上面的链接有解答关于《火哥视频中EEPROM-WaitForWriteEnd-函数检测EV6事件为什么不能用CheckEvent-函数来检测》问题的解答。" class="headerlink" title="本篇文章是本人学习野火STM32读写EEPROM的视频总结而来的笔记,上面的链接有解答关于《火哥视频中EEPROM_WaitForWriteEnd()函数检测EV6事件为什么不能用CheckEvent()函数来检测》问题的解答。"></a>本篇文章是本人学习<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ps411M7Dr?p=22">野火STM32读写EEPROM</a>的视频总结而来的笔记,上面的链接有解答关于《火哥视频中EEPROM_WaitForWriteEnd()函数检测EV6事件为什么不能用CheckEvent()函数来检测》问题的解答。</h4><h3 id="上述问题火哥视频的链接-24-I2C—读写EEPROM（第7节中）—代码详解-读写EEPROM-进度条58-50自己去看"><a href="#上述问题火哥视频的链接-24-I2C—读写EEPROM（第7节中）—代码详解-读写EEPROM-进度条58-50自己去看" class="headerlink" title="上述问题火哥视频的链接[24-I2C—读写EEPROM（第7节中）—代码详解-读写EEPROM]  进度条58:50自己去看"></a>上述问题火哥视频的链接[<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ps411M7Dr?p=30">24-I2C—读写EEPROM（第7节中）—代码详解-读写EEPROM</a>]  进度条58:50自己去看</h3><hr>
+<h1 id="I2C协议介绍"><a href="#I2C协议介绍" class="headerlink" title="I2C协议介绍"></a>I2C协议介绍</h1><h1 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h1><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/58bf08d2a99f4d48832f15001f33f5b6.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/211966f5a4384c6e8b080a413f2b8e00.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="1-SCL-串行时钟线"><a href="#1-SCL-串行时钟线" class="headerlink" title="1.SCL 串行时钟线"></a>1.SCL 串行时钟线</h3><h3 id="2-SDA-双向串行数据线"><a href="#2-SDA-双向串行数据线" class="headerlink" title="2.SDA 双向串行数据线"></a>2.SDA 双向串行数据线</h3><h3 id="3-每个设备有独立的地址"><a href="#3-每个设备有独立的地址" class="headerlink" title="3.每个设备有独立的地址"></a>3.每个设备有独立的地址</h3><h3 id="4-每个设备在空闲状态时都会输出高阻态，所有都为空闲状态时，则总线被上拉为高电平"><a href="#4-每个设备在空闲状态时都会输出高阻态，所有都为空闲状态时，则总线被上拉为高电平" class="headerlink" title="4.每个设备在空闲状态时都会输出高阻态，所有都为空闲状态时，则总线被上拉为高电平"></a>4.每个设备在空闲状态时都会输出高阻态，所有都为空闲状态时，则总线被上拉为高电平</h3><h3 id="5-SDA-设备用高阻态表示高电平-1-，接地表示低电平-0"><a href="#5-SDA-设备用高阻态表示高电平-1-，接地表示低电平-0" class="headerlink" title="5.SDA 设备用高阻态表示高电平(1)，接地表示低电平(0)"></a>5.SDA 设备用高阻态表示高电平(1)，接地表示低电平(0)</h3><h3 id="6-三种传输模式：标准传输速率为100kbit-s，快速模式为400kbits-s，高速模式为3-4Mbit-s-大多数设备不支持"><a href="#6-三种传输模式：标准传输速率为100kbit-s，快速模式为400kbits-s，高速模式为3-4Mbit-s-大多数设备不支持" class="headerlink" title="6.三种传输模式：标准传输速率为100kbit/s，快速模式为400kbits/s，高速模式为3.4Mbit/s(大多数设备不支持)"></a>6.三种传输模式：标准传输速率为100kbit/s，快速模式为400kbits/s，高速模式为3.4Mbit/s(大多数设备不支持)</h3><br/>
+
+<hr>
+<h1 id="协议层"><a href="#协议层" class="headerlink" title="协议层"></a>协议层</h1><h1 id="1-I2C基本读写过程"><a href="#1-I2C基本读写过程" class="headerlink" title="1.I2C基本读写过程"></a>1.I2C基本读写过程</h1><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/605b347efddd4f059c7f07419ef923a8.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/a6d42d3b5fe04790a1f8ad7ee042e383.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="1-数据和时钟线都为高时总线处于空闲状态。"><a href="#1-数据和时钟线都为高时总线处于空闲状态。" class="headerlink" title="1. 数据和时钟线都为高时总线处于空闲状态。"></a>1. 数据和时钟线都为高时总线处于<u>空闲状态</u>。</h3><h3 id="2-当SCL为高电平时SDA的下降沿为起始条件-S-。"><a href="#2-当SCL为高电平时SDA的下降沿为起始条件-S-。" class="headerlink" title="2. 当SCL为高电平时SDA的下降沿为起始条件( S )。"></a>2. 当SCL为高电平时SDA的下降沿为<u>起始条件</u>( S )。</h3><h3 id="3-当SCL为高电平时SDA的上升沿为停止条件-P-。"><a href="#3-当SCL为高电平时SDA的上升沿为停止条件-P-。" class="headerlink" title="3. 当SCL为高电平时SDA的上升沿为停止条件( P )。"></a>3. 当SCL为高电平时SDA的上升沿为<u>停止条件</u>( P )。</h3><h3 id="4-当SCL为高电平时，SDA的数据有效，否则无效。"><a href="#4-当SCL为高电平时，SDA的数据有效，否则无效。" class="headerlink" title="4. 当SCL为高电平时，SDA的数据有效，否则无效。"></a>4. 当SCL为高电平时，SDA的<u>数据有效</u>，否则<u>无效</u>。</h3><br/>
+
+<h1 id="2-地址及数据方向"><a href="#2-地址及数据方向" class="headerlink" title="2.地址及数据方向"></a>2.地址及数据方向</h1><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b2e117d16f914160aebedd83263d52ee.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="前七位为从机地址，最后一位为读写方向位"><a href="#前七位为从机地址，最后一位为读写方向位" class="headerlink" title="前七位为从机地址，最后一位为读写方向位"></a>前七位为从机地址，最后一位为读写方向位</h3><h3 id="从高位开始传输"><a href="#从高位开始传输" class="headerlink" title="从高位开始传输"></a>从高位开始传输</h3><br/>
+
+<h1 id="3-响应"><a href="#3-响应" class="headerlink" title="3.响应"></a>3.响应</h1><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/046d448f1f414cc68d699eb59f829c99.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="当数据端释放SDA控制权后，若接收端控制SDA为低电平时-在第9个时钟-，则产生了应答信号-ACK-，若为高电平，即无动作，则产生非应答信号-NACK-。"><a href="#当数据端释放SDA控制权后，若接收端控制SDA为低电平时-在第9个时钟-，则产生了应答信号-ACK-，若为高电平，即无动作，则产生非应答信号-NACK-。" class="headerlink" title="当数据端释放SDA控制权后，若接收端控制SDA为低电平时(在第9个时钟)，则产生了应答信号(ACK)，若为高电平，即无动作，则产生非应答信号(NACK)。"></a>当数据端释放SDA控制权后，若接收端控制SDA为低电平时(在第9个时钟)，则产生了<u>应答信号(ACK)</u>，若为高电平，即无动作，则产生<u>非应答信号(NACK)</u>。</h3><br/>
+
+<hr>
+<h1 id="STM32的I2C架构"><a href="#STM32的I2C架构" class="headerlink" title="STM32的I2C架构"></a>STM32的I2C架构</h1><br/>
+
+<h2 id="1-通讯引脚"><a href="#1-通讯引脚" class="headerlink" title="1.通讯引脚"></a>1.通讯引脚</h2><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/5e747754a818448ab1bb687014ac6cb2.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="I2C1"><a href="#I2C1" class="headerlink" title="I2C1"></a>I2C1</h3><h4 id="默认复用"><a href="#默认复用" class="headerlink" title="默认复用"></a>默认复用</h4><h5 id="SCL-PB5-SDA-PB6"><a href="#SCL-PB5-SDA-PB6" class="headerlink" title="SCL:PB5     SDA:PB6"></a>SCL:PB5     SDA:PB6</h5><br/>
+
+<h5 id="重定义"><a href="#重定义" class="headerlink" title="重定义"></a>重定义</h5><h5 id="SCL-PB8-SDA-PB9"><a href="#SCL-PB8-SDA-PB9" class="headerlink" title="SCL:PB8     SDA:PB9"></a>SCL:PB8     SDA:PB9</h5><h3 id="I2C2"><a href="#I2C2" class="headerlink" title="I2C2"></a>I2C2</h3><h4 id="默认复用-1"><a href="#默认复用-1" class="headerlink" title="默认复用"></a>默认复用</h4><h5 id="SCL-PB10-SDA-PB11"><a href="#SCL-PB10-SDA-PB11" class="headerlink" title="SCL:PB10     SDA:PB11"></a>SCL:PB10     SDA:PB11</h5><br/>
+
+
+
+<h2 id="2-时钟控制逻辑"><a href="#2-时钟控制逻辑" class="headerlink" title="2.时钟控制逻辑"></a>2.时钟控制逻辑</h2><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/d903ef71ddda44e7ae4c784cb25e90c4.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b93e18ec2b2546cabe88cb26fba88e2a.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/0e3e9bbbdba1475bb26b499ffa1e5f72.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="1-I2C模块的时钟频率必须是10MHz整数倍"><a href="#1-I2C模块的时钟频率必须是10MHz整数倍" class="headerlink" title="1.I2C模块的时钟频率必须是10MHz整数倍"></a>1.I2C模块的时钟频率必须是10MHz整数倍</h3><h3 id="2-PE为0时才能配置CCR寄存器"><a href="#2-PE为0时才能配置CCR寄存器" class="headerlink" title="2.PE为0时才能配置CCR寄存器"></a>2.PE为0时才能配置CCR寄存器</h3><h3 id="3-标准模式下-100kbit-s-Thigh-Tlow-注：T-Thigh-Tlow，这里的100kHz的周期应当是二者相加"><a href="#3-标准模式下-100kbit-s-Thigh-Tlow-注：T-Thigh-Tlow，这里的100kHz的周期应当是二者相加" class="headerlink" title="3.标准模式下(100kbit/s) Thigh = Tlow(注：T = Thigh + Tlow，这里的100kHz的周期应当是二者相加)"></a>3.标准模式下(100kbit/s) Thigh = Tlow(注：T = Thigh + Tlow，这里的100kHz的周期应当是二者相加)</h3><h3 id="4-DUTY-位标准模式没关系，是用来设置快速模式的占空比-2-1-16-9"><a href="#4-DUTY-位标准模式没关系，是用来设置快速模式的占空比-2-1-16-9" class="headerlink" title="4.DUTY 位标准模式没关系，是用来设置快速模式的占空比(2:1 16:9)"></a>4.DUTY 位标准模式没关系，是用来设置快速模式的占空比(2:1 16:9)</h3><h3 id="5-CCR根据自己配置的I2C模式自行计算，"><a href="#5-CCR根据自己配置的I2C模式自行计算，" class="headerlink" title="5.CCR根据自己配置的I2C模式自行计算，"></a>5.CCR根据自己配置的I2C模式自行计算，</h3><h3 id="若PCLK-8MHz-FREQ寄存器控制"><a href="#若PCLK-8MHz-FREQ寄存器控制" class="headerlink" title="若PCLK = 8MHz  (FREQ寄存器控制)"></a>若PCLK = 8MHz  (FREQ寄存器控制)</h3><h3 id="100kbit-s-对应的-CCR-0x28-40"><a href="#100kbit-s-对应的-CCR-0x28-40" class="headerlink" title="100kbit/s  对应的 CCR = 0x28 = 40"></a>100kbit/s  对应的 CCR = 0x28 = 40</h3><h3 id="400kbit-s-对应的-CCR-0x0A-10"><a href="#400kbit-s-对应的-CCR-0x0A-10" class="headerlink" title="400kbit/s  对应的 CCR = 0x0A = 10"></a>400kbit/s  对应的 CCR = 0x0A = 10</h3><br/>
+
+<h2 id="3-数据控制逻辑"><a href="#3-数据控制逻辑" class="headerlink" title="3.数据控制逻辑"></a>3.数据控制逻辑</h2><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/3639a075012f44898dce0f54b34c378e.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/4eed5acd5bac48b29db5db930956b66d.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<br/>
+
+
+<h2 id="4-整体控制逻辑"><a href="#4-整体控制逻辑" class="headerlink" title="4.整体控制逻辑"></a>4.整体控制逻辑</h2><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/8f849285deff4e21a8e7f636dc3e38eb.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b23f45a0fe584e6b9625452f1a7502a4.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><br><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/3e3b8c0356a54b0e9ea86516379a6605.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/84370d0750f141499dc845d24bd3deb3.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h4 id="I2C配置由CR1-和-CR2-寄存器配置"><a href="#I2C配置由CR1-和-CR2-寄存器配置" class="headerlink" title="I2C配置由CR1 和 CR2 寄存器配置"></a>I2C配置由CR1 和 CR2 寄存器配置</h4><h4 id="工作时的状态由SR1-和-SR2-寄存器显示"><a href="#工作时的状态由SR1-和-SR2-寄存器显示" class="headerlink" title="工作时的状态由SR1 和 SR2 寄存器显示"></a>工作时的状态由SR1 和 SR2 寄存器显示</h4><br/>
+
+<hr>
+<h1 id="STM32-I2C-通讯过程"><a href="#STM32-I2C-通讯过程" class="headerlink" title="STM32 I2C 通讯过程"></a>STM32 I2C 通讯过程</h1><h2 id="1-主发送器模式"><a href="#1-主发送器模式" class="headerlink" title="1.主发送器模式"></a>1.主发送器模式</h2><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/7fd4b855a80f4036aaf04d598f0533d6.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="7位主发送模式过程："><a href="#7位主发送模式过程：" class="headerlink" title="7位主发送模式过程："></a>7位主发送模式过程：</h3><h4 id="1-Start-信号产生。"><a href="#1-Start-信号产生。" class="headerlink" title="1. Start 信号产生。"></a>1. Start 信号产生。</h4><h4 id="2-EV5事件产生，SB-1-，即开始条件发送完成位置1，读SR1-寄存器，并写入DR寄存器能清除该事件。"><a href="#2-EV5事件产生，SB-1-，即开始条件发送完成位置1，读SR1-寄存器，并写入DR寄存器能清除该事件。" class="headerlink" title="2. EV5事件产生，SB = 1 ，即开始条件发送完成位置1，读SR1 寄存器，并写入DR寄存器能清除该事件。"></a>2. EV5事件产生，SB = 1 ，即开始条件发送完成位置1，读SR1 寄存器，并写入DR寄存器能清除该事件。</h4><h4 id="3-把地址写入DR寄存器。"><a href="#3-把地址写入DR寄存器。" class="headerlink" title="3. 把地址写入DR寄存器。"></a>3. 把地址写入DR寄存器。</h4><h4 id="4-接收到ACK信号。"><a href="#4-接收到ACK信号。" class="headerlink" title="4. 接收到ACK信号。"></a>4. 接收到ACK信号。</h4><h4 id="5-产生EV6事件，ADDR-地址已被发送位-1-，当收到地址的ACK后该位被置1，读SR1-和-SR2-会清除该位。"><a href="#5-产生EV6事件，ADDR-地址已被发送位-1-，当收到地址的ACK后该位被置1，读SR1-和-SR2-会清除该位。" class="headerlink" title="5. 产生EV6事件，ADDR(地址已被发送位) = 1 ，当收到地址的ACK后该位被置1，读SR1 和 SR2 会清除该位。"></a>5. 产生EV6事件，ADDR(地址已被发送位) = 1 ，当收到地址的ACK后该位被置1，读SR1 和 SR2 会清除该位。</h4><h4 id="6-产生EV8-1事件，-TXE-数据寄存器为空位-1-，移位寄存器和数据寄存器都为空，写入DR寄存器可以清除该标志位。"><a href="#6-产生EV8-1事件，-TXE-数据寄存器为空位-1-，移位寄存器和数据寄存器都为空，写入DR寄存器可以清除该标志位。" class="headerlink" title="6. 产生EV8_1事件， TXE(数据寄存器为空位) = 1 ，移位寄存器和数据寄存器都为空，写入DR寄存器可以清除该标志位。"></a>6. 产生EV8_1事件， TXE(数据寄存器为空位) = 1 ，移位寄存器和数据寄存器都为空，写入DR寄存器可以清除该标志位。</h4><h4 id="7-写入DR寄存器。"><a href="#7-写入DR寄存器。" class="headerlink" title="7. 写入DR寄存器。"></a>7. 写入DR寄存器。</h4><h4 id="8-产生EV8事件，TXE-数据寄存器为空位-1-，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。"><a href="#8-产生EV8事件，TXE-数据寄存器为空位-1-，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。" class="headerlink" title="8. 产生EV8事件，TXE(数据寄存器为空位) = 1 ，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。"></a>8. 产生EV8事件，TXE(数据寄存器为空位) = 1 ，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。</h4><h4 id="9-接收到ACK应答信号。"><a href="#9-接收到ACK应答信号。" class="headerlink" title="9. 接收到ACK应答信号。"></a>9. 接收到ACK应答信号。</h4><h4 id="10-写入DR寄存器-第二次发送数据-。"><a href="#10-写入DR寄存器-第二次发送数据-。" class="headerlink" title="10. 写入DR寄存器(第二次发送数据)。"></a>10. 写入DR寄存器(第二次发送数据)。</h4><h4 id="11-产生EV8事件，TXE-数据寄存器为空位-1-，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。"><a href="#11-产生EV8事件，TXE-数据寄存器为空位-1-，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。" class="headerlink" title="11. 产生EV8事件，TXE(数据寄存器为空位) = 1 ，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。"></a>11. 产生EV8事件，TXE(数据寄存器为空位) = 1 ，数据寄存器为空，移位寄存器不为空，写入DR寄存器可以清除该位。</h4><h4 id="12-所有数据发送完成后产生EV8-2事件，此时BTF-和-TXE-1-。"><a href="#12-所有数据发送完成后产生EV8-2事件，此时BTF-和-TXE-1-。" class="headerlink" title="12. 所有数据发送完成后产生EV8_2事件，此时BTF 和 TXE = 1 。"></a>12. 所有数据发送完成后产生EV8_2事件，此时BTF 和 TXE = 1 。</h4><h4 id="13-发送停止信号"><a href="#13-发送停止信号" class="headerlink" title="13. 发送停止信号"></a>13. 发送停止信号</h4><h3 id="10位主发送模式过程同理"><a href="#10位主发送模式过程同理" class="headerlink" title="10位主发送模式过程同理"></a>10位主发送模式过程同理</h3><h2 id="2-主接收器模式"><a href="#2-主接收器模式" class="headerlink" title="2.主接收器模式"></a>2.主接收器模式</h2><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/41e5fbc1f0084619878c80ff84814f57.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="7位主接收模式过程："><a href="#7位主接收模式过程：" class="headerlink" title="7位主接收模式过程："></a>7位主接收模式过程：</h3><h4 id="1-Start-信号产生。-1"><a href="#1-Start-信号产生。-1" class="headerlink" title="1. Start 信号产生。"></a>1. Start 信号产生。</h4><h4 id="2-EV5事件产生，SB-1-，即开始条件发送完成位置1，读SR1-寄存器，并写入DR寄存器能清除该事件。-1"><a href="#2-EV5事件产生，SB-1-，即开始条件发送完成位置1，读SR1-寄存器，并写入DR寄存器能清除该事件。-1" class="headerlink" title="2. EV5事件产生，SB = 1 ，即开始条件发送完成位置1，读SR1 寄存器，并写入DR寄存器能清除该事件。"></a>2. EV5事件产生，SB = 1 ，即开始条件发送完成位置1，读SR1 寄存器，并写入DR寄存器能清除该事件。</h4><h4 id="3-把地址写入DR寄存器。-1"><a href="#3-把地址写入DR寄存器。-1" class="headerlink" title="3. 把地址写入DR寄存器。"></a>3. 把地址写入DR寄存器。</h4><h4 id="4-接收到ACK信号。-1"><a href="#4-接收到ACK信号。-1" class="headerlink" title="4. 接收到ACK信号。"></a>4. 接收到ACK信号。</h4><h4 id="5-产生EV6事件，ADDR-地址已被发送位-1-，当收到地址的ACK后该位被置1，读SR1-和-SR2-会清除该位。-1"><a href="#5-产生EV6事件，ADDR-地址已被发送位-1-，当收到地址的ACK后该位被置1，读SR1-和-SR2-会清除该位。-1" class="headerlink" title="5. 产生EV6事件，ADDR(地址已被发送位) = 1 ，当收到地址的ACK后该位被置1，读SR1 和 SR2 会清除该位。"></a>5. 产生EV6事件，ADDR(地址已被发送位) = 1 ，当收到地址的ACK后该位被置1，读SR1 和 SR2 会清除该位。</h4><h4 id="6-产生EV6-1事件，用于接收1个字节，需要清除响应-ACK-和停止条件-STOP-的产生位。"><a href="#6-产生EV6-1事件，用于接收1个字节，需要清除响应-ACK-和停止条件-STOP-的产生位。" class="headerlink" title="6. 产生EV6_1事件，用于接收1个字节，需要清除响应(ACK)和停止条件(STOP)的产生位。"></a>6. 产生EV6_1事件，用于接收1个字节，需要清除响应(ACK)和停止条件(STOP)的产生位。</h4><h4 id="7-主机产生ACK应答信号。"><a href="#7-主机产生ACK应答信号。" class="headerlink" title="7. 主机产生ACK应答信号。"></a>7. 主机产生ACK应答信号。</h4><h4 id="8-产生EV7事件，RXNE-1-，此时DR寄存器不为空，需要读DR寄存器来清除该事件。"><a href="#8-产生EV7事件，RXNE-1-，此时DR寄存器不为空，需要读DR寄存器来清除该事件。" class="headerlink" title="8. 产生EV7事件，RXNE = 1 ，此时DR寄存器不为空，需要读DR寄存器来清除该事件。"></a>8. 产生EV7事件，RXNE = 1 ，此时DR寄存器不为空，需要读DR寄存器来清除该事件。</h4><h4 id="9-主机产生ACK应答信号。"><a href="#9-主机产生ACK应答信号。" class="headerlink" title="9. 主机产生ACK应答信号。"></a>9. 主机产生ACK应答信号。</h4><h4 id="10-产生EV7-1事件，RXNE-1-，此时DR寄存器不为空，需要读DR寄存器来清除该事件。并且需要设置ACK-0-，STOP-1。"><a href="#10-产生EV7-1事件，RXNE-1-，此时DR寄存器不为空，需要读DR寄存器来清除该事件。并且需要设置ACK-0-，STOP-1。" class="headerlink" title="10. 产生EV7_1事件，RXNE = 1 ，此时DR寄存器不为空，需要读DR寄存器来清除该事件。并且需要设置ACK = 0 ，STOP = 1。"></a>10. 产生EV7_1事件，RXNE = 1 ，此时DR寄存器不为空，需要读DR寄存器来清除该事件。并且需要设置ACK = 0 ，STOP = 1。</h4><h4 id="11-主机产生NACK非应答信号。"><a href="#11-主机产生NACK非应答信号。" class="headerlink" title="11. 主机产生NACK非应答信号。"></a>11. 主机产生NACK非应答信号。</h4><h4 id="12-主机产生STOP信号。"><a href="#12-主机产生STOP信号。" class="headerlink" title="12. 主机产生STOP信号。"></a>12. 主机产生STOP信号。</h4><h4 id="13-产生EV7事件。"><a href="#13-产生EV7事件。" class="headerlink" title="13. 产生EV7事件。"></a>13. 产生EV7事件。</h4><h3 id="10位主接收模式过程同理"><a href="#10位主接收模式过程同理" class="headerlink" title="10位主接收模式过程同理"></a>10位主接收模式过程同理</h3><br/>
+
+<hr>
+<h1 id="STM32-IIC-库函数"><a href="#STM32-IIC-库函数" class="headerlink" title="STM32 IIC 库函数"></a>STM32 IIC 库函数</h1><h2 id="1-I2C-初始化结构体"><a href="#1-I2C-初始化结构体" class="headerlink" title="1.I2C 初始化结构体"></a>1.I2C 初始化结构体</h2><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/299a94df358a45faaa7c259675d3d748.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="1-I2C-ClockSpeed"><a href="#1-I2C-ClockSpeed" class="headerlink" title="1.I2C_ClockSpeed"></a>1.I2C_ClockSpeed</h3><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/b22a375d6ac9486f87e04fba69810ffb.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<p><strong>注：I2C的标准和快速模式已经在这里配置完成，根据输入的时钟值来确定，小于等于100k为标准，否则为快速</strong></p>
+<br/>
+
+
+<h3 id="2-I2C-Mode"><a href="#2-I2C-Mode" class="headerlink" title="2.I2C_Mode"></a>2.I2C_Mode</h3><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/167761144d1c4da98952f5a8b9a7a573.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="3-I2C-DutyCycle"><a href="#3-I2C-DutyCycle" class="headerlink" title="3.I2C_DutyCycle"></a>3.I2C_DutyCycle</h3><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/f7345ec5247e466bb5c6180d7ff39ece.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="4-I2C-OwnAddress1"><a href="#4-I2C-OwnAddress1" class="headerlink" title="4.I2C_OwnAddress1"></a>4.I2C_OwnAddress1</h3><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/7d93b9b5359440e7875a960e3c082f4b.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="5-I2C-Ack"><a href="#5-I2C-Ack" class="headerlink" title="5.I2C_Ack"></a>5.I2C_Ack</h3><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/3cecb490735e47ba881c757f83345d41.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+<h3 id="6-I2C-AcknowledgedAddress"><a href="#6-I2C-AcknowledgedAddress" class="headerlink" title="6.I2C_AcknowledgedAddress"></a>6.I2C_AcknowledgedAddress</h3><p><img src="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/STM32I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/images/abbe6829601a43daa4c0aa17420c9982.png" srcset="https://cdn.jsdelivr.net/gh/Varocol/ImgHosting/Varocol_Blog/Fluid_img/loading.gif" lazyload></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/STM32/">STM32</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/STM32/">STM32</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/">单片机</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/10/20/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【EASYX配置教程】在VScode中使用EASYX详细教程(VScode+MSVC+EasyX)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/10/19/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9E%E9%99%85%E9%97%AE%E9%A2%98%E5%92%8CBug/">
+                        <span class="hidden-mobile">【STM32学习笔记】STM32 I2C读写EEPROM(AT24C02)的一些实际问题和Bug</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"4a2be69ab3f57f6eadb8","clientSecret":"005138e8454534d2e0e6da03d6ac1054bb6d862f","repo":"Varocol.github.io","owner":"Varocol","admin":["Varocol"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":true,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '40c944c544e698bfe20cae0afbed3ebb'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+
+<footer class="text-center mt-5 py-3" 
+style="text-align:center ;position: relative; bottom: 0px; margin-top: 20px; margin-bottom: 20px;">
+  <div class="footer-content">
+    
+  </div>
+  <div class="Copyright 运行时间 百度统计" >
+    Copyright&copy2020-2021 
+    <a href = "index.html">VAROCOL'S BLOG</href></a>
+    |
+    
+
+    <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+    |
+    <a href = "https://tongji.baidu.com/web/welcome/ico?s=7dab352fc9f5c306287dcb844b669be5" target="_blank">百度统计</href></a>
+    |
+    
+      <!-- cnzz统计 -->
+      <script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1280441904'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1280441904%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+    
+  </div>
+  <div class="github-icons" style="text-align:center ;position: relative; bottom: 0px;margin-top: 20px; margin-bottom: 20px;">
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.io/" target="_blank" title="由 Hexo 强力驱动">
+      <span class="badge-subject">Powered</span><span class="badge-value bg-blue">Hexo</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://github.com/" target="_blank" title="静态网页托管于 GitHub Pages 和 Coding Pages">
+      <span class="badge-subject">Hosted</span><span class="badge-value bg-brightgreen">GitHub</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://cloud.tencent.com/" target="_blank" title="腾讯云提供域名相关服务">
+      <span class="badge-subject">DNS</span><span class="badge-value bg-blueviolet">TencentCloud</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://www.jsdelivr.com/" target="_blank" title="jsDelivr 提供 CDN 加速服务">
+      <span class="badge-subject">CDN</span><span class="badge-value bg-orange">JsDelivr</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://hexo.fluid-dev.com/docs/" target="_blank" title="站点使用 Fluid 主题">
+    <span class="badge-subject">Theme</span><span class="badge-value bg-blue">Fluid</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="本站点采用知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议进行许可">
+      <span class="badge-subject"><i class="fa fa-copyright">&copy</i></span><span class="badge-value bg-lightgrey">BY-NC-SA 4.0</span></a>
+    </div>
+    <div class="github-badge">
+      <a style="color: #fff" rel="license" href="https://996.icu/" target="_blank" title="支持 996.ICU">
+      <span class="badge-subject">Link</span><span class="badge-value bg-red">996.ICU</span></a>
+    </div>
+        
+<!-- LeanCloud 统计PV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="总阅读量">
+  <span class="badge-subject" id="leancloud-site-pv-container">PV</span><span class="badge-value bg-brightgreen" id="leancloud-site-pv"></span>
+  </div>
+</div>
+ 
+<!-- LeanCloud 统计UV -->
+<div class="github-badge">
+  <div style="color: #fff" rel="license" target="_blank" title="访问人数">
+  <span class="badge-subject" id="leancloud-site-uv-container">UV</span><span class="badge-value bg-orange" id="leancloud-site-uv"></span>
+</div>
+</div>
+  
+    
+    <div class="github-badge">
+      <div style="color: #fff" rel="license" target="_blank" title="全站总字数"></a>
+      <span class="badge-subject">WordCount</span><span class="badge-value bg-blueviolet">13.3k</span></div>
+    </div>
+    
+    </div>    
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-EZ19RNEQ72', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=289234140"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '289234140');
+    </script>
+  
+
+  
+
+  
+
+  
+    <!-- cnzz Analytics -->
+    <!-- <script defer src="//s4.cnzz.com/z_stat.php?id=1280441904&show=pic"
+            type="text/javascript"></script> -->
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+<!--单击显示文字-->
+<!-- <script type="text/javascript" src="/js/click_show_text.js"></script> -->
+<!-- 点击冒点 -->
+<script src="/js/maodian.js"></script>
+<!--浏览器搞笑标题-->
+<script src="/js/FunnyTitle.js"></script>
+<!-- 雪花特效 -->
+<script src="\js\snow.js"></script>
+<!-- 樱花特效 -->
+<!-- <script src="/js/fairyDustCursor.js"></script> -->
+<!-- 代码雨 -->
+<script src="/js/DigitalRain.js"></script>
+<!-- 网页预加载 -->
+<script src="\js\instantclick.js"></script>
+<!-- 网站时间统计 -->
+<script src="\js\timecount.js"></script>
+<!-- 鼠标点击烟花爆炸 -->
+<!-- <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas>  -->
+<!-- <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>  -->
+<!-- <script src="/js/fireworks.js"></script> -->
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"right","width":175,"height":350},"mobile":{"show":true},"react":{"opacity":0.8},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

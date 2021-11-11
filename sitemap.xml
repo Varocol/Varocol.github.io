@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/20/%E6%9D%AD%E7%94%B5%20oj%201006%20Tick%20and%20Tick%20%E4%B8%AA%E4%BA%BA%E9%A2%98%E8%A7%A3/</loc>
+    
+    <lastmod>2021-10-19</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/20/%E5%9C%A8VScode%E4%B8%AD%E4%BD%BF%E7%94%A8EASYX%E8%AF%A6%E7%BB%86%E6%95%99%E7%A8%8B(VScode+MSVC+EasyX)/</loc>
+    
+    <lastmod>2021-10-19</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/20/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/</loc>
+    
+    <lastmod>2021-10-19</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/19/STM32%20I2C%E8%AF%BB%E5%86%99EEPROM(AT24C02)%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9E%E9%99%85%E9%97%AE%E9%A2%98%E5%92%8CBug/</loc>
+    
+    <lastmod>2021-10-19</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/11/TIM%E5%AE%9A%E6%97%B6%E5%99%A8/</loc>
+    
+    <lastmod>2021-10-18</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/11/USART%E4%B8%B2%E5%8F%A3/</loc>
+    
+    <lastmod>2021-10-13</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/about/index.html</loc>
+    
+    <lastmod>2021-10-12</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/11/SPI/</loc>
+    
+    <lastmod>2021-10-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/10/I2C/</loc>
+    
+    <lastmod>2021-10-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/11/STM32%E4%B8%AD%E6%96%AD/</loc>
+    
+    <lastmod>2021-10-10</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/2021/10/10/EXTI%E4%B8%AD%E6%96%AD/</loc>
+    
+    <lastmod>2021-10-10</lastmod>
+    
+  </url>
+  
+
+  <url>
+    <loc>https://www.varocol.top/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  
+  <url>
+    <loc>https://www.varocol.top/tags/STM32/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/tags/%E5%8D%95%E7%89%87%E6%9C%BA/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/tags/ACM/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/tags/%E7%AE%97%E6%B3%95/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/tags/EasyX/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/tags/%E6%95%99%E7%A8%8B/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+
+  
+  <url>
+    <loc>https://www.varocol.top/categories/STM32/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/categories/ACM/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.varocol.top/categories/%E6%95%99%E7%A8%8B/</loc>
+    <lastmod>2021-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+</urlset>
